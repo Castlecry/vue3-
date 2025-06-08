@@ -33,21 +33,34 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   function (response) {
     // 2xx 范围内的状态码都会触发该函数。
-    // 对响应数据做点什么
-    // console.log('response.data.code:' + response.data.code)
-
-    //200是正常状态
-    if (response.data.code === 200) {
-      return response.data
-    }
-
-    //否则的话给前台提示，并且给前端控制台放回Promise异常
+    
+    // --- 正确的逻辑 ---
+    // 只要HTTP状态码是2xx，就认为请求是成功的。
+    // 我们直接返回后端发送的数据体 (response.data)。
+    // 具体的业务逻辑（比如token是否存在）应该在调用API的页面组件中处理。
+    return response;
+  },
+  function (err) {
+    // 超出 2xx 范围的状态码都会触发该函数。
+    
+    // 错误的默认情况，只给提示
+    // 从err.response.data.detail中获取FastAPI返回的错误信息
     ElMessage({
-      message: response.data.message || '服务异常',
+      message: err.response?.data?.detail || '服务异常，请稍后重试',
       type: 'error'
-    })
+    });
 
-    return Promise.reject(response.data)
+    // 错误的特殊情况，如果是401未授权，则跳转到登录页
+    if (err.response?.status === 401) {
+      // 清除本地的用户信息（如果存在）
+      // const userStore = useUserStore();
+      // userStore.logout(); 
+      router.push('/login');
+    }
+    
+    // 将错误继续抛出，让页面组件的catch块也能捕获到
+    return Promise.reject(err);
+  
   },
   function (err) {
     //错误的默认情况，只给提示

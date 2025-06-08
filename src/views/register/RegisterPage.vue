@@ -7,14 +7,14 @@ import { registerService } from '@/api/login.js'
 const router = useRouter()
 
 const formData = ref({
-  userNum: '',
+  username: '',
   password: '',
   repassword: '',
-  type: 2 // 默认选择学生
+  role: 2 // 默认选择学生
 })
 
 const rules = {
-  userNum: [
+  username: [
     { required: true, message: '请输入账号', trigger: 'blur' },
     { min: 3, max: 12, message: '账号必须是3-12位的字符', trigger: 'blur' }
   ],
@@ -26,7 +26,7 @@ const rules = {
       trigger: 'blur'
     }
   ],
-  type: [{ required: true, message: '请选择注册类型', trigger: 'change' }]
+  role: [{ required: true, message: '请选择注册类型', trigger: 'change' }]
 }
 
 const form = ref(null)
@@ -68,7 +68,7 @@ const register = async () => {
         <el-form-item prop="userNum">
           <el-input
             :prefix-icon="User"
-            v-model="formData.userNum"
+            v-model="formData.username"
             placeholder="请输入账号"
           ></el-input>
         </el-form-item>
@@ -89,7 +89,7 @@ const register = async () => {
           ></el-input>
         </el-form-item>
         <el-form-item prop="type">
-          <el-radio-group v-model="formData.type" class="role-select">
+          <el-radio-group v-model="formData.role" class="role-select">
             <el-radio :label="1">管理员</el-radio>
             <el-radio :label="2">学生</el-radio>
             <el-radio :label="3">教师</el-radio>
