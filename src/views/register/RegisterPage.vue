@@ -26,6 +26,24 @@ const rules = {
       trigger: 'blur'
     }
   ],
+  repassword: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    {
+      pattern: /^\S{6,15}$/,
+      message: '密码必须是6-15位的非空字符',
+      trigger: 'blur'
+    },
+    {
+      validator: (rule, value, callback) => {
+        if (value !== formData.value.password) {
+          callback(new Error('两次输入密码不一致'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
+  ],
   role: [{ required: true, message: '请选择注册类型', trigger: 'change' }]
 }
 

@@ -55,43 +55,42 @@ const login = async () => {
   await form.value.validate()
   try {
     // 调用API
-    const resp = await loginService(fromData.value);
+    const resp = await loginService(fromData.value)
 
     // 登录成功逻辑
-    ElMessage.success('登录成功');
-    userStore.setToken(resp.data.access_token);
-    userStore.setUserId(resp.data.userId);
-    userStore.setUserName(resp.data.username);
+    ElMessage.success('登录成功')
+    userStore.setToken(resp.data.access_token)
+    userStore.setUserId(resp.data.userid)
+    userStore.setUserName(resp.data.username)
 
     console.log(resp.data)
     // 根据角色进行跳转
     if (fromData.value.role === 2) {
-      router.push('/student');
-    } else if (fromData.value.role === 1) { // 修正变量名
-      router.push('/admin');
-    } else if (fromData.value.role === 3) { // 修正变量名
-      router.push('/teacher');
+      router.push('/student')
+    } else if (fromData.value.role === 1) {
+      // 修正变量名
+      router.push('/admin')
+    } else if (fromData.value.role === 3) {
+      // 修正变量名
+      router.push('/teacher')
     }
-
   } catch (err) {
     // --- 这是修改后的错误处理逻辑 ---
-    console.error("登录API调用失败:", err); // 在控制台打印详细错误，方便调试
+    console.error('登录API调用失败:', err) // 在控制台打印详细错误，方便调试
 
     // 从错误对象中提取后端返回的错误信息来提示用户
     // axios的错误通常在 err.response.data.detail 中
     if (err.response && err.response.data && err.response.data.detail) {
-      ElMessage.error(err.response.data.detail);
+      ElMessage.error(err.response.data.detail)
     } else {
       // 其他未知错误
-      ElMessage.error('登录请求失败，请稍后重试。');
+      ElMessage.error('登录请求失败，请稍后重试。')
     }
     // 注意：这里不再有 throw new Error(err)
-    
   } finally {
     // --- 无论成功或失败，最后都停止加载 ---
-    loading.value = false;
+    loading.value = false
   }
-
 }
 </script>
 
