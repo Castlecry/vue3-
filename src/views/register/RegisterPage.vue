@@ -96,15 +96,19 @@ const register = async () => {
           </el-radio-group>
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            class="register-btn"
-            @click="register"
-            :loading="loading"
-          >
-            立即注册
-          </el-button>
-          <el-button @click="router.push('/login')">返回登录</el-button>
+          <div class="button-container">
+            <el-button
+              type="primary"
+              class="register-btn"
+              @click="register"
+              :loading="loading"
+            >
+              立即注册
+            </el-button>
+            <el-button class="return-login" @click="router.push('/login')">
+              返回登录
+            </el-button>
+          </div>
         </el-form-item>
       </el-form>
     </el-col>
@@ -144,6 +148,19 @@ const register = async () => {
 
   .register-btn {
     width: 100%;
+  }
+}
+
+.button-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  .return-login {
+    width: 80%;
+    margin-top: 10px;
   }
 }
 </style>
