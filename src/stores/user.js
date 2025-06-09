@@ -7,12 +7,12 @@ export const useUserStore = defineStore(
     const token = ref('') // 定义 token
     const setToken = (t) => (token.value = t) // 设置 token
 
-    const userid = ref('') //定义用户id
-    const setUserId = (id) => (userid.value = id) //设置id
+    const userId = ref('') //定义用户id
+    const setUserId = (id) => (userId.value = id) //设置id
 
-    const username = ref('') //定义用户名字
+    const userName = ref('') //定义用户名字
     const setUserName = (username) => (username.value = username) //设置用户名字
-    return { token, setToken, userid, setUserId, username, setUserName }
+    return { token, setToken, userId, setUserId, userName, setUserName }
   },
   {
     //开启持久化

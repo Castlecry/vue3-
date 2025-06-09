@@ -94,3 +94,11 @@ export const getTimeTableListService = (stuNum) => {
     }
   })
 }
+
+// 智能助手获取回答
+export const getAIAnswerService = (userId, content) => {
+  return request.post('/api/student-qa', {
+    userId,
+    content
+  })
+}
