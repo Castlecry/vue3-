@@ -74,7 +74,7 @@ const logout = async () => {
       <el-main>
         <router-view></router-view>
       </el-main>
-      <el-footer>智能平台 ©2023 Created by 502C组</el-footer>
+      <el-footer>智能平台 ©2025 Created by 502C组</el-footer>
     </el-container>
   </el-container>
 </template>

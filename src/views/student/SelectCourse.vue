@@ -1,69 +1,105 @@
 <script setup>
 import PageContainer from '@/components/PageContainer.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { getAIAnswerService } from '@/api/student.js' // 导入API
-import { ElMessage } from 'element-plus' // 导入ElMessage
-import { ElInput, ElButton } from 'element-plus' // 导入ElInput和ElButton
+import { getAIAnswerService, getAIAnswerServicemore } from '@/api/student.js'
+import { ElMessage } from 'element-plus'
+
 // 获取当前时间（HH:MM格式）
 const getCurrentTime = () => {
   const time = new Date().toTimeString().slice(0, 5)
   return time
 }
 
-// 消息列表（用户消息和AI回复）
+// 消息列表
 const messages = ref([
   {
     type: 'ai',
     content: '你好！我是你的智能助手，有什么可以帮你解答的？',
     time: ''
-  } // 初始时间留空
+  }
 ])
 
 // 输入框内容
 const inputText = ref('')
 
-// 组件挂载时设置初始消息时间
+// 消息容器引用
+const chatContainer = ref(null)
+
+// 组件挂载时设置初始消息时间并滚动到底部
 onMounted(() => {
   messages.value[0].time = getCurrentTime()
+  scrollToBottom()
 })
 
 // 发送消息
 const sendMessage = async () => {
-  // 修改为async函数
-  if (!inputText.value.trim()) return
-  // 添加用户消息（使用当前时间）
+  if (!inputText.value.trim()) {
+    ElMessage.warning('请输入消息内容')
+    return
+  }
+
+  const userQuestion = inputText.value.trim()
+
+  // 添加用户消息
   messages.value.push({
     type: 'user',
-    content: inputText.value.trim(),
+    content: userQuestion,
     time: getCurrentTime()
   })
-  // 调用API获取AI回答
+
   try {
-    const userStore = useUserStore() // 需要从pinia中获取用户ID（假设已存在userStore）
-    const response = await getAIAnswerService(
-      userStore.userId,
-      inputText.value.trim()
-    )
-    const content = response.data // 存储后端返回的回答内容
-    // 添加AI回复（使用当前时间）
+    const userStore = useUserStore()
+    let response
+
+    // 判断是否首次提问
+    if (qaHistory.value.length === 0) {
+      response = await getAIAnswerService(userStore.userId, userQuestion)
+    } else {
+      response = await getAIAnswerServicemore(userStore.userId, qaHistory.value)
+    }
+
+    const aiAnswer = response.data
+
+    // 添加AI回复
     messages.value.push({
       type: 'ai',
-      content: content, // 使用后端返回的内容
+      content: '正在回答:' + aiAnswer,
       time: getCurrentTime()
     })
+
+    // 维护历史问答
+    qaHistory.value.push({
+      question: userQuestion,
+      answer: aiAnswer
+    })
   } catch (error) {
-    ElMessage.error('获取回答失败，请重试') // 添加错误提示
+    console.error('获取回答失败', error)
+    ElMessage.error('获取回答失败，请重试')
   } finally {
     inputText.value = ''
+
+    // 无论用户当前位置如何，都强制滚动到底部
+    await nextTick()
+    scrollToBottom()
   }
 }
+
+// 滚动到底部
+const scrollToBottom = () => {
+  if (chatContainer.value) {
+    chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+  }
+}
+
+// 存储历史问答对
+const qaHistory = ref([])
 </script>
 
 <template>
   <PageContainer title="智能学习助手小C">
     <!-- 消息显示区域 -->
-    <div class="chat-container">
+    <div ref="chatContainer" class="chat-container">
       <div class="messages" v-for="(msg, index) in messages" :key="index">
         <!-- AI回复消息 -->
         <div v-if="msg.type === 'ai'" class="message ai-message">
@@ -108,13 +144,11 @@ const sendMessage = async () => {
 
 <style scoped lang="scss">
 .chat-container {
-  // 原高度：calc(100vh - 180px)
-  height: calc(70vh - 180px); /* 缩短为占屏幕高度的70%，减少滚动需求 */
+  height: calc(70vh - 180px);
   overflow-y: auto;
   padding: 20px;
   background: #f5f7fa;
 }
-
 .messages {
   display: flex;
   flex-direction: column;

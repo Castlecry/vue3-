@@ -47,7 +47,7 @@ const logout = async () => {
         </el-menu-item>
         <el-menu-item index="/student/querySelectedCourse">
           <el-icon><Promotion /></el-icon>
-          <span>已选课程</span>
+          <span>我的课程</span>
         </el-menu-item>
         <el-menu-item index="/student/applyLeave">
           <el-icon><Promotion /></el-icon>
@@ -73,7 +73,7 @@ const logout = async () => {
       <el-main>
         <router-view></router-view>
       </el-main>
-      <el-footer>智能平台 ©2023 Created by 502C组</el-footer>
+      <el-footer>智能平台 ©2025 Created by 502C组</el-footer>
     </el-container>
   </el-container>
 </template>

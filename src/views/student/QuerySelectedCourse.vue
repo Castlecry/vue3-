@@ -5,7 +5,7 @@ import { ref } from 'vue'
 import { getHasSelectCourseListService, delCourseService } from '@/api/student'
 import { formatTime } from '@/utils/format'
 
-const courseName = ref('')
+const teachername = ref('')
 const courseList = ref([])
 const isLoading = ref(false)
 
@@ -56,14 +56,14 @@ const selectHasCourseByCourseName = (courseName) => {
 </script>
 
 <template>
-  <PageContainer title="已选课程页面">
+  <PageContainer title="我的作业">
     <template #extra>
       <div class="header">
-        <el-input placeholder="请输入课程名" v-model="courseName"></el-input>
+        <el-input placeholder="请输入老师名" v-model="teachername"></el-input>
         <el-button
           type="primary"
           style="margin-left: 20px"
-          @click="selectHasCourseByCourseName(courseName)"
+          @click="selectHasCourseByCourseName(teachername)"
           >查询</el-button
         >
       </div>

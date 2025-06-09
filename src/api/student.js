@@ -102,3 +102,10 @@ export const getAIAnswerService = (userId, content) => {
     content
   })
 }
+
+export const getAIAnswerServicemore = (userId, history) => {
+  return request.post('/api/student-qa/refine', {
+    userId,
+    history
+  })
+}
