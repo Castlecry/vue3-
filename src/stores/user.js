@@ -11,7 +11,7 @@ export const useUserStore = defineStore(
     const setUserId = (id) => (userId.value = id) //设置id
 
     const userName = ref('') //定义用户名字
-    const setUserName = (username) => (username.value = username) //设置用户名字
+    const setUserName = (username) => (userName.value = username) //设置用户名字
     return { token, setToken, userId, setUserId, userName, setUserName }
   },
   {

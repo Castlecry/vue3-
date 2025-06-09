@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import axios from 'axios'
 
 // 学生信息页面
 export const studentGetInfo = (userId) => {
@@ -96,16 +97,19 @@ export const getTimeTableListService = (stuNum) => {
 }
 
 // 智能助手获取回答
-export const getAIAnswerService = (userId, content) => {
+export const getAIAnswerService = (student_id, question) => {
+  request.defaults.timeout = 1000000
   return request.post('/api/student-qa', {
-    userId,
-    content
+    student_id,
+    question
   })
 }
 
-export const getAIAnswerServicemore = (userId, history) => {
+export const getAIAnswerServicemore = (student_id, history,new_query) => {
+  request.defaults.timeout = 1000000
   return request.post('/api/student-qa/refine', {
-    userId,
-    history
+    student_id,
+    history,
+    new_query
   })
 }

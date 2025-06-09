@@ -14,7 +14,7 @@ const getCurrentTime = () => {
 // 消息列表
 const messages = ref([
   {
-    type: 'ai',
+    role: 'assistant',
     content: '你好！我是你的智能助手，有什么可以帮你解答的？',
     time: ''
   }
@@ -43,7 +43,7 @@ const sendMessage = async () => {
 
   // 添加用户消息
   messages.value.push({
-    type: 'user',
+    role: 'user',
     content: userQuestion,
     time: getCurrentTime()
   })
@@ -52,26 +52,28 @@ const sendMessage = async () => {
     const userStore = useUserStore()
     let response
 
-    // 判断是否首次提问
+
     if (qaHistory.value.length === 0) {
       response = await getAIAnswerService(userStore.userId, userQuestion)
     } else {
-      response = await getAIAnswerServicemore(userStore.userId, qaHistory.value)
+      response = await getAIAnswerServicemore(userStore.userId, qaHistory.value,userQuestion)
     }
 
-    const aiAnswer = response.data
+    const aiAnswer = response.data.llm_answer
 
     // 添加AI回复
     messages.value.push({
-      type: 'ai',
-      content: '正在回答:' + aiAnswer,
+      role: 'assistant',
+      content: '回答如下:' + aiAnswer,
       time: getCurrentTime()
     })
-
-    // 维护历史问答
     qaHistory.value.push({
-      question: userQuestion,
-      answer: aiAnswer
+      role:"user",
+      content: userQuestion,
+    })
+    qaHistory.value.push({
+      role:"assistant",
+      content: aiAnswer
     })
   } catch (error) {
     console.error('获取回答失败', error)
@@ -102,7 +104,7 @@ const qaHistory = ref([])
     <div ref="chatContainer" class="chat-container">
       <div class="messages" v-for="(msg, index) in messages" :key="index">
         <!-- AI回复消息 -->
-        <div v-if="msg.type === 'ai'" class="message ai-message">
+        <div v-if="msg.role === 'assistant'" class="message ai-message">
           <div class="avatar">
             <img
               src="@/assets/ai.png"
