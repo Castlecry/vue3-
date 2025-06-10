@@ -89,17 +89,46 @@ export const rejectApplyLeaveService = (cst) => {
 // 智能助手获取回答
 export const getAIAnswerService = (teacher_id, query) => {
   request.defaults.timeout = 1000000
-  return request.post('/api/student-qa', {
+  return request.post('/api/teaching-qa', {
     teacher_id,
     query
   })
 }
 
-export const getAIAnswerServicemore = (teacher_id, history, new_query) => {
+export const getAIAnswerServicemore = (
+  teacher_id,
+  history,
+  new_query,
+  base_teaching_plan_id
+) => {
   request.defaults.timeout = 1000000
-  return request.post('/api/student-qa/refine', {
+  return request.post('/api/teaching-qa/refine', {
     teacher_id,
     history,
-    new_query
+    new_query,
+    base_teaching_plan_id
+  })
+}
+// 智能助手获取回答考核生成
+export const getAIAnswerService1 = (teacher_id, query) => {
+  request.defaults.timeout = 1000000
+  return request.post('/api/assements/generate', {
+    teacher_id,
+    query
+  })
+}
+
+export const getAIAnswerService1more = (
+  teacher_id,
+  history,
+  new_query,
+  base_teaching_plan_id
+) => {
+  request.defaults.timeout = 1000000
+  return request.post('/api/accessments/refine', {
+    teacher_id,
+    history,
+    new_query,
+    base_teaching_plan_id
   })
 }

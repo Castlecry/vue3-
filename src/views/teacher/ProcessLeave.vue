@@ -24,7 +24,7 @@ const messages = ref([
 
 // 输入框内容
 const inputText = ref('')
-
+let qa_id = ref(null)
 // 消息容器引用
 const chatContainer = ref(null)
 
@@ -70,10 +70,11 @@ const sendMessage = async () => {
       response = await getAIAnswerServicemore(
         userStore.userId,
         qaHistory.value,
-        userQuestion
+        userQuestion,
+        qa_id.value
       )
     }
-
+    qa_id.value = response.data.teaching_plan_id
     const aiAnswer = response.data.llm_answer
 
     // 替换临时消息为实际回答

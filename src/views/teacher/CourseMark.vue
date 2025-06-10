@@ -1,158 +1,281 @@
 <script setup>
 import PageContainer from '@/components/PageContainer.vue'
-import { ref } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { formatTime } from '@/utils/format'
-import { getMarkListService, markOperateService } from '@/api/teacher'
+import { getAIAnswerService1, getAIAnswerService1more } from '@/api/teacher.js'
+import { ElMessage } from 'element-plus'
+import { Loading } from '@element-plus/icons-vue' // 导入加载图标
+import { ElIcon } from 'element-plus' // 导入图标组件
 
-const courseName = ref('')
-const markList = ref([])
-const isLoading = ref(false)
-const userStore = useUserStore()
-const dialogFormVisible = ref(false)
-
-//得到打分列表
-const getMarkList = async () => {
-  isLoading.value = true
-  const resp = await getMarkListService(userStore.userId)
-  markList.value = resp.data
-  isLoading.value = false
-}
-getMarkList()
-
-//根据课程名得到打分列表
-const selectByCourseName = async (courseName) => {
-  isLoading.value = true
-  const resp = await getMarkListService(userStore.userId, courseName)
-  markList.value = resp.data
-  isLoading.value = false
+// 获取当前时间（HH:MM格式）
+const getCurrentTime = () => {
+  const time = new Date().toTimeString().slice(0, 5)
+  return time
 }
 
-//弹出来打分框操作
-const formData = ref({
-  mark: '',
-  fullMark: '',
-  courseNum: '',
-  stuNum: '',
-  techNum: ''
+// 消息列表
+const messages = ref([
+  {
+    role: 'assistant',
+    content: '你好！我是你的智能助手，有什么可以帮你解答的？',
+    time: ''
+  }
+])
+
+// 输入框内容
+const inputText = ref('')
+let qa_id=ref(null)
+// 消息容器引用
+const chatContainer = ref(null)
+
+// 组件挂载时设置初始消息时间并滚动到底部
+onMounted(() => {
+  messages.value[0].time = getCurrentTime()
+  scrollToBottom()
 })
 
-const rules = {
-  mark: [
-    {
-      required: true,
-      message: '分数不能为空',
-      trigger: 'blur'
-    },
-    {
-      pattern: /^[1-9]\d*$/,
-      message: '分数不能为负数或小数',
-      trigger: 'blur'
-    },
-    {
-      validator: (rule, value, callback) => {
-        if (formData.value.mark > formData.value.fullMark) {
-          callback(new Error('设置分数不能超过满分分数'))
-        } else {
-          callback()
-        }
-      },
-      trigger: 'blur'
+// 发送消息
+const sendMessage = async () => {
+  if (!inputText.value.trim()) {
+    ElMessage.warning('请输入消息内容')
+    return
+  }
+
+  const userQuestion = inputText.value.trim()
+
+  // 添加用户消息
+  messages.value.push({
+    role: 'user',
+    content: userQuestion,
+    time: getCurrentTime()
+  })
+
+  // 添加加载中的临时消息
+  const thinkingMsgId = messages.value.length // 记录临时消息位置
+  messages.value.push({
+    role: 'assistant',
+    content: '正在为您思考如何解决…………',
+    time: getCurrentTime(),
+    isLoading: true // 标记为加载状态
+  })
+  isThinking.value = true
+
+  try {
+    const userStore = useUserStore()
+    let response
+
+    if (qaHistory.value.length === 0) {
+      response = await getAIAnswerService1(userStore.userId, userQuestion)
+    } else {
+      response = await getAIAnswerService1more(
+        userStore.userId,
+        qaHistory.value,
+        userQuestion,
+        qa_id.value
+      )
     }
-  ],
-  fullMark: {
-    required: true,
-    message: '满分不能为空',
-    trigger: 'blur'
+    qa_id.value = response.data.teaching_plan_id
+    const aiAnswer = response.data.llm_answer
+
+    // 替换临时消息为实际回答
+    messages.value[thinkingMsgId] = {
+      role: 'assistant',
+      content: '回答如下:' + aiAnswer,
+      time: getCurrentTime()
+    }
+
+    // 维护历史问答
+    qaHistory.value.push({
+      role: 'user',
+      content: userQuestion
+    })
+    qaHistory.value.push({
+      role: 'assistant',
+      content: aiAnswer
+    })
+  } catch (error) {
+    console.error('获取回答失败', error)
+    ElMessage.error('获取回答失败，请重试')
+    // 替换临时消息为错误提示
+    messages.value[thinkingMsgId] = {
+      role: 'assistant',
+      content: '抱歉，当前回答遇到问题，请重试',
+      time: getCurrentTime()
+    }
+  } finally {
+    inputText.value = ''
+    isThinking.value = false
+    await nextTick()
+    scrollToBottom()
   }
 }
 
-const form = ref(null)
-//打开打分对话框
-const openDialog = (row) => {
-  dialogFormVisible.value = true
-  formData.value = { ...row }
-  formData.value.techNum = userStore.userId
+// 滚动到底部
+const scrollToBottom = () => {
+  if (chatContainer.value) {
+    chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+  }
 }
 
-//进行打分
-const submitData = async () => {
-  //1.表单校验
-  await form.value.validate()
+// 存储历史问答对
+const qaHistory = ref([])
 
-  await markOperateService(formData.value)
-  ElMessage.success('打分成功')
-  getMarkList()
-  dialogFormVisible.value = false
-}
+// 新增：加载状态（思考中）
+const isThinking = ref(false)
 </script>
 
 <template>
-  <PageContainer title="打分页面">
-    <template #extra>
-      <div class="header">
-        <el-input placeholder="请输入课程名" v-model="courseName"></el-input>
-        <el-button
-          type="primary"
-          style="margin-left: 20px"
-          @click="selectByCourseName(courseName)"
-          >查询</el-button
-        >
+  <PageContainer title="智能学习助手小C">
+    <!-- 消息显示区域 -->
+    <div ref="chatContainer" class="chat-container">
+      <div class="messages" v-for="(msg, index) in messages" :key="index">
+        <!-- AI回复消息 -->
+        <div v-if="msg.role === 'assistant'" class="message ai-message">
+          <div class="avatar">
+            <img
+              src="@/assets/ai.png"
+              alt="AI头像"
+              style="width: 100%; height: 100%; border-radius: 50%"
+            />
+          </div>
+          <div class="content">
+            <!-- 加载状态时显示图标 -->
+            <div v-if="msg.isLoading" class="text flex items-center gap-2">
+              <el-icon><Loading /></el-icon>
+              <span>{{ msg.content }}</span>
+            </div>
+            <div v-else class="text">
+              {{ msg.content }}
+            </div>
+            <div class="time">{{ msg.time }}</div>
+          </div>
+        </div>
+
+        <!-- 用户消息 -->
+        <div v-else class="message user-message">
+          <div class="content">
+            <div class="text">{{ msg.content }}</div>
+            <div class="time">{{ msg.time }}</div>
+          </div>
+          <div class="avatar">👤</div>
+        </div>
       </div>
-    </template>
+    </div>
 
-    <!-- 查询课程表格 -->
-    <el-table v-loading="isLoading" :data="markList" style="width: 100%">
-      <el-table-column prop="courseNum" label="课程号"></el-table-column>
-      <el-table-column prop="courseName" label="课程名"></el-table-column>
-      <el-table-column prop="stuNum" label="学生学号"></el-table-column>
-      <el-table-column prop="stuName" label="学生姓名"></el-table-column>
-      <el-table-column prop="startTime" label="开课时间">
-        <template #default="{ row }">
-          {{ formatTime(row.startTime) }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="endTime" label="结课时间">
-        <template #default="{ row }">
-          {{ formatTime(row.endTime) }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="fullMark" label="课程满分"></el-table-column>
-      <el-table-column label="操作" width="150">
-        <template #default="{ row }">
-          <el-button type="primary" @click="openDialog(row)">打分</el-button>
-        </template>
-      </el-table-column>
-
-      <template #empty>
-        <el-empty description="没有数据"></el-empty>
-      </template>
-    </el-table>
-
-    <!-- 编辑打分内容 -->
-    <!-- 消息对话框  打分内容 -->
-    <el-dialog v-model="dialogFormVisible" title="打分页面">
-      <el-form :rules="rules" :model="formData" ref="form">
-        <el-form-item label="满分" prop="fullMark">
-          <el-text type="primary">{{ formData.fullMark }}分</el-text>
-        </el-form-item>
-        <!-- 设置分数 -->
-        <el-form-item label="设置分数" prop="mark">
-          <el-input placeholder="请输入分数" v-model="formData.mark"></el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitData"> 提交 </el-button>
-        </span>
-      </template>
-    </el-dialog>
+    <!-- 输入区域 -->
+    <div class="input-area">
+      <el-input
+        v-model="inputText"
+        placeholder="输入消息并回车发送"
+        @keyup.enter="sendMessage"
+        class="input"
+      ></el-input>
+      <el-button type="primary" @click="sendMessage" class="send-btn"
+        >发送</el-button
+      >
+    </div>
   </PageContainer>
 </template>
 
-<style scoped>
-.header {
+<style scoped lang="scss">
+.chat-container {
+  height: calc(70vh - 180px);
+  overflow-y: auto;
+  padding: 20px;
+  background: #f5f7fa;
+}
+.messages {
   display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.message {
+  display: flex;
+  align-items: flex-start;
+  max-width: 70%;
+}
+
+.ai-message {
+  justify-content: flex-start;
+}
+
+.user-message {
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10px;
+}
+
+.ai-message .avatar {
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.user-message .avatar {
+  background: #f0f9eb;
+  color: #52c41a;
+}
+
+.content {
+  background: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  flex-grow: 1;
+}
+
+.user-message .content {
+  background: #e6f4ff;
+}
+
+.text {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.time {
+  font-size: 12px;
+  color: #909399;
+  text-align: right;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  background: white;
+  border-top: 1px solid #ebedf0;
+}
+
+.input {
+  flex-grow: 1;
+  height: 40px; /* 增加输入框高度 */
+  .el-input__inner {
+    border-radius: 20px; /* 输入框圆角 */
+    padding: 0 20px; /* 调整内边距 */
+    font-size: 14px;
+  }
+}
+
+.send-btn {
+  white-space: nowrap;
+  height: 40px; /* 与输入框高度一致 */
+  padding: 0 24px; /* 增加按钮内边距 */
+  border-radius: 20px; /* 按钮圆角 */
+  background: #1677ff; /* 主色背景 */
+  border: none;
+  &:hover {
+    background: #4096ff; /* 悬停颜色 */
+  }
 }
 </style>
