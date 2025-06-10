@@ -85,3 +85,21 @@ export const rejectApplyLeaveService = (cst) => {
     }
   })
 }
+
+// 智能助手获取回答
+export const getAIAnswerService = (teacher_id, query) => {
+  request.defaults.timeout = 1000000
+  return request.post('/api/student-qa', {
+    teacher_id,
+    query
+  })
+}
+
+export const getAIAnswerServicemore = (teacher_id, history, new_query) => {
+  request.defaults.timeout = 1000000
+  return request.post('/api/student-qa/refine', {
+    teacher_id,
+    history,
+    new_query
+  })
+}
