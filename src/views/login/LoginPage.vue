@@ -46,38 +46,38 @@ const rules = {
     }
   ]
 }
-// const testAccounts = {
-//   student: {
-//     username: 'student',
-//     password: '123456',
-//     role: 2
-//   },
-//   teacher: {
-//     username: 'teacher',
-//     password: '123456',
-//     role: 3
-//   }
-// }
+const testAccounts = {
+  student: {
+    username: 'student',
+    password: '123456',
+    role: 2
+  },
+  teacher: {
+    username: 'teacher',
+    password: '123456',
+    role: 3
+  }
+}
 const form = ref(null)
 //登录功能
 const userStore = useUserStore()
 const router = useRouter()
 const login = async () => {
   //在该区域写登录测试账号
-  // const matchedAccount = Object.values(testAccounts).find(
-  //   (account) =>
-  //     account.username === fromData.value.username &&
-  //     account.password === fromData.value.password
-  // )
-  // if (matchedAccount) {
-  //   // 根据角色跳转
-  //   if (matchedAccount.role === 2) {
-  //     router.push('/student')
-  //   } else if (matchedAccount.role === 3) {
-  //     router.push('/teacher')
-  //   }
-  //   return // 匹配成功后直接返回，不执行后续逻辑
-  // }
+  const matchedAccount = Object.values(testAccounts).find(
+    (account) =>
+      account.username === fromData.value.username &&
+      account.password === fromData.value.password
+  )
+  if (matchedAccount) {
+    // 根据角色跳转
+    if (matchedAccount.role === 2) {
+      router.push('/student')
+    } else if (matchedAccount.role === 3) {
+      router.push('/teacher')
+    }
+    return // 匹配成功后直接返回，不执行后续逻辑
+  }
   await form.value.validate()
   try {
     // 调用API

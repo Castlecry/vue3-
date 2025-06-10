@@ -1,5 +1,4 @@
 import request from '@/utils/request'
-import axios from 'axios'
 
 // 学生信息页面
 export const studentGetInfo = (userId) => {

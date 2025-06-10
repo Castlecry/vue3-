@@ -4,6 +4,8 @@ import { ref, onMounted, nextTick } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { getAIAnswerService, getAIAnswerServicemore } from '@/api/student.js'
 import { ElMessage } from 'element-plus'
+import { Loading } from '@element-plus/icons-vue' // 导入加载图标
+import { ElIcon } from 'element-plus' // 导入图标组件
 
 // 获取当前时间（HH:MM格式）
 const getCurrentTime = () => {
@@ -48,40 +50,60 @@ const sendMessage = async () => {
     time: getCurrentTime()
   })
 
+  // 添加加载中的临时消息
+  const thinkingMsgId = messages.value.length // 记录临时消息位置
+  messages.value.push({
+    role: 'assistant',
+    content: '正在为您思考如何解决…………',
+    time: getCurrentTime(),
+    isLoading: true // 标记为加载状态
+  })
+  isThinking.value = true
+
   try {
     const userStore = useUserStore()
     let response
 
-
     if (qaHistory.value.length === 0) {
       response = await getAIAnswerService(userStore.userId, userQuestion)
     } else {
-      response = await getAIAnswerServicemore(userStore.userId, qaHistory.value,userQuestion)
+      response = await getAIAnswerServicemore(
+        userStore.userId,
+        qaHistory.value,
+        userQuestion
+      )
     }
 
     const aiAnswer = response.data.llm_answer
 
-    // 添加AI回复
-    messages.value.push({
+    // 替换临时消息为实际回答
+    messages.value[thinkingMsgId] = {
       role: 'assistant',
       content: '回答如下:' + aiAnswer,
       time: getCurrentTime()
+    }
+
+    // 维护历史问答
+    qaHistory.value.push({
+      role: 'user',
+      content: userQuestion
     })
     qaHistory.value.push({
-      role:"user",
-      content: userQuestion,
-    })
-    qaHistory.value.push({
-      role:"assistant",
+      role: 'assistant',
       content: aiAnswer
     })
   } catch (error) {
     console.error('获取回答失败', error)
     ElMessage.error('获取回答失败，请重试')
+    // 替换临时消息为错误提示
+    messages.value[thinkingMsgId] = {
+      role: 'assistant',
+      content: '抱歉，当前回答遇到问题，请重试',
+      time: getCurrentTime()
+    }
   } finally {
     inputText.value = ''
-
-    // 无论用户当前位置如何，都强制滚动到底部
+    isThinking.value = false
     await nextTick()
     scrollToBottom()
   }
@@ -96,6 +118,9 @@ const scrollToBottom = () => {
 
 // 存储历史问答对
 const qaHistory = ref([])
+
+// 新增：加载状态（思考中）
+const isThinking = ref(false)
 </script>
 
 <template>
@@ -113,7 +138,14 @@ const qaHistory = ref([])
             />
           </div>
           <div class="content">
-            <div class="text">{{ msg.content }}</div>
+            <!-- 加载状态时显示图标 -->
+            <div v-if="msg.isLoading" class="text flex items-center gap-2">
+              <el-icon><Loading /></el-icon>
+              <span>{{ msg.content }}</span>
+            </div>
+            <div v-else class="text">
+              {{ msg.content }}
+            </div>
             <div class="time">{{ msg.time }}</div>
           </div>
         </div>
@@ -145,6 +177,15 @@ const qaHistory = ref([])
 </template>
 
 <style scoped lang="scss">
+.flex {
+  display: flex;
+}
+.items-center {
+  align-items: center;
+}
+.gap-2 {
+  gap: 8px; /* 图标与文字间距 */
+}
 .chat-container {
   height: calc(70vh - 180px);
   overflow-y: auto;
