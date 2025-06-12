@@ -216,6 +216,7 @@ const isThinking = ref(false)
 .avatar {
   width: 32px;
   height: 32px;
+  flex-shrink: 0; /* 防止头像因父容器收缩被压缩 */
   border-radius: 50%;
   display: flex;
   align-items: center;

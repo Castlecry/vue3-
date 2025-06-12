@@ -56,6 +56,10 @@ const router = createRouter({
         {
           path: 'processCourse',
           component: () => import('@/views/teacher/ProcessLeave.vue')
+        },
+        {
+          path: 'questionfork',
+          component: () => import('@/views/teacher/questionfork.vue')
         }
       ]
     },

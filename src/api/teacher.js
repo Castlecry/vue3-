@@ -132,3 +132,19 @@ export const getAIAnswerService1more = (
     base_teaching_plan_id
   })
 }
+//学情评估展示，在teacher的CourseManage页面
+export const getStudentcondition = (assessment_id) => {
+  return request.get(`api/assessments/${assessment_id}/student-performance/12`)
+}
+
+// 获取题库列表
+export const getQuestionBanks = (teacher_id) => {
+  return request.get(`/teacher/questionBanks/${teacher_id}`)
+}
+
+// 发布题库
+export const publishQuestionBank = (assessmentId) => {
+  return request.post('/teacher/publishQuestionBank', {
+    assessment_id: assessmentId
+  })
+}

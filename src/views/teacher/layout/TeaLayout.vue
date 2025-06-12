@@ -43,7 +43,7 @@ const logout = async () => {
         </el-menu-item>
         <el-menu-item index="/teacher/courseManage">
           <el-icon><Promotion /></el-icon>
-          <span>课程管理</span>
+          <span>学生学情评估</span>
         </el-menu-item>
         <el-menu-item index="/teacher/courseMark">
           <el-icon><Promotion /></el-icon>
@@ -52,6 +52,10 @@ const logout = async () => {
         <el-menu-item index="/teacher/processCourse">
           <el-icon><Promotion /></el-icon>
           <span>备课与设计</span>
+        </el-menu-item>
+        <el-menu-item index="/teacher/questionfork">
+          <el-icon><Promotion /></el-icon>
+          <span>题库</span>
         </el-menu-item>
       </el-menu>
     </el-aside>

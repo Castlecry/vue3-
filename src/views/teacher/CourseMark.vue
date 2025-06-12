@@ -24,7 +24,7 @@ const messages = ref([
 
 // 输入框内容
 const inputText = ref('')
-let qa_id=ref(null)
+let qa_id = ref(null)
 // 消息容器引用
 const chatContainer = ref(null)
 
@@ -74,8 +74,8 @@ const sendMessage = async () => {
         qa_id.value
       )
     }
-    qa_id.value = response.data.teaching_plan_id
-    const aiAnswer = response.data.llm_answer
+    qa_id.value = response.data.assessment_id
+    const aiAnswer = response.data.generated_assessment_content
 
     // 替换临时消息为实际回答
     messages.value[thinkingMsgId] = {
@@ -208,6 +208,7 @@ const isThinking = ref(false)
 .avatar {
   width: 32px;
   height: 32px;
+  flex-shrink: 0; /* 防止头像因父容器收缩被压缩 */
   border-radius: 50%;
   display: flex;
   align-items: center;
