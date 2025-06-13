@@ -51,7 +51,7 @@ const logout = async () => {
         </el-menu-item>
         <el-menu-item index="/student/applyLeave">
           <el-icon><Promotion /></el-icon>
-          <span>请假申请</span>
+          <span>查询作业</span>
         </el-menu-item>
       </el-menu>
     </el-aside>

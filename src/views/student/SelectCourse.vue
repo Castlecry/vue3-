@@ -250,6 +250,7 @@ const isThinking = ref(false)
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 4px;
+  white-space: pre-line;
 }
 
 .time {

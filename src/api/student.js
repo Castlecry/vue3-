@@ -54,29 +54,6 @@ export const delCourseService = (userId, courseNum, techNum) => {
   })
 }
 
-//请假申请功能
-export const getLeaveListService = (userId) => {
-  return request.get('/student/getLeaveList', {
-    params: {
-      stuNum: userId
-    }
-  })
-}
-
-export const applyLeaveService = (cst) => {
-  return request.post('/student/applyLeave', cst)
-}
-
-export const removeLeaveService = (cst) => {
-  return request.delete('/student/removeLeave', {
-    params: {
-      courseNum: cst.courseNum,
-      techNum: cst.techNum,
-      stuNum: cst.stuNum
-    }
-  })
-}
-
 //展示学分数据
 export const getHasScoresService = (stuNum) => {
   return request.get('/student/getHasScores', {
@@ -104,11 +81,27 @@ export const getAIAnswerService = (student_id, question) => {
   })
 }
 
-export const getAIAnswerServicemore = (student_id, history,new_query) => {
+export const getAIAnswerServicemore = (student_id, history, new_query) => {
   request.defaults.timeout = 1000000
   return request.post('/api/student-qa/refine', {
     student_id,
     history,
     new_query
+  })
+}
+
+// 获取作业列表（示例）
+export const getHomeworkListService = (studentId) => {
+  return request.get(`/api/assessment/list/${studentId}`)
+}
+
+// 获取作业详情（示例）
+export const getHomeworkDetailService = (id) => {
+  return request.get(`/api/assessment/${id}/details`)
+}
+
+export const submitHomeworkService = (data) => {
+  return request.post('/homework/submit', {
+    data
   })
 }

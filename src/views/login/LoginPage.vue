@@ -71,11 +71,14 @@ const login = async () => {
   )
   if (matchedAccount) {
     // 根据角色跳转
+    ElMessage.success('登录成功')
     if (matchedAccount.role === 2) {
       router.push('/student')
     } else if (matchedAccount.role === 3) {
       router.push('/teacher')
     }
+    userStore.setUserId(matchedAccount.userid)
+    userStore.setUserName(matchedAccount.username)
     return // 匹配成功后直接返回，不执行后续逻辑
   }
   await form.value.validate()
