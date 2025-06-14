@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/store/modules/user'
+import { ElMessage } from 'element-plus'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -90,14 +92,14 @@ const router = createRouter({
 export default router
 
 // 路由前置守卫
-// router.beforeEach((to) => {
-//   const userStore = useUserStore()
-//   //如果没有token，且访问非登录页，就跳转回来
-//   if (!userStore.token && to.path !== '/login') {
-//     ElMessage({
-//       message: '登录状态过期，请先登录',
-//       type: 'error'
-//     })
-//     router.push('/login')
-//   }
-// })
+router.beforeEach((to) => {
+  const userStore = useUserStore()
+  //如果没有token，且访问非登录页，就跳转回来
+  if (!userStore.token && to.path !== '/login') {
+    ElMessage({
+      message: '登录状态过期，请先登录',
+      type: 'error'
+    })
+    router.push('/login')
+  }
+})
