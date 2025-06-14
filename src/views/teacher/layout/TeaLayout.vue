@@ -41,15 +41,15 @@ const logout = async () => {
           <el-icon><Management /></el-icon>
           <span>教师信息</span>
         </el-menu-item>
-        <el-menu-item index="/teacher/courseManage">
+        <el-menu-item index="/teacher/situationassessment">
           <el-icon><Promotion /></el-icon>
           <span>学生学情评估</span>
         </el-menu-item>
-        <el-menu-item index="/teacher/courseMark">
+        <el-menu-item index="/teacher/aimake">
           <el-icon><Promotion /></el-icon>
           <span>ai制作考核</span>
         </el-menu-item>
-        <el-menu-item index="/teacher/processCourse">
+        <el-menu-item index="/teacher/PreDesign">
           <el-icon><Promotion /></el-icon>
           <span>备课与设计</span>
         </el-menu-item>

@@ -41,17 +41,17 @@ const logout = async () => {
           <el-icon><Management /></el-icon>
           <span>学生信息</span>
         </el-menu-item>
-        <el-menu-item index="/student/selectCourse">
+        <el-menu-item index="/student/aiol">
           <el-icon><Promotion /></el-icon>
           <span>在线学习助手</span>
         </el-menu-item>
-        <el-menu-item index="/student/querySelectedCourse">
+        <el-menu-item index="/student/onlinepractise">
           <el-icon><Promotion /></el-icon>
-          <span>我的课程</span>
+          <span>在线练习</span>
         </el-menu-item>
-        <el-menu-item index="/student/applyLeave">
+        <el-menu-item index="/student/queryWork">
           <el-icon><Promotion /></el-icon>
-          <span>查询作业</span>
+          <span>作业</span>
         </el-menu-item>
       </el-menu>
     </el-aside>

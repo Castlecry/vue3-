@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { ElMessage } from 'element-plus'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,16 +21,16 @@ const router = createRouter({
           component: () => import('@/views/student/StuInfo.vue')
         },
         {
-          path: 'selectCourse',
-          component: () => import('@/views/student/SelectCourse.vue')
+          path: 'aiol',
+          component: () => import('@/views/student/OLai.vue')
         },
         {
-          path: 'querySelectedCourse',
-          component: () => import('@/views/student/QuerySelectedCourse.vue')
+          path: 'onlinepractise',
+          component: () => import('@/views/student/OnlinePractise.vue')
         },
         {
-          path: 'applyLeave',
-          component: () => import('@/views/student/ApplyLeave.vue')
+          path: 'queryWork',
+          component: () => import('@/views/student/QueryWork.vue')
         }
       ]
     },
@@ -46,16 +44,16 @@ const router = createRouter({
           component: () => import('@/views/teacher/TeaInfo.vue')
         },
         {
-          path: 'courseManage',
-          component: () => import('@/views/teacher/CourseManager.vue')
+          path: 'situationassessment',
+          component: () => import('@/views/teacher/SituAssess.vue')
         },
         {
-          path: 'courseMark',
-          component: () => import('@/views/teacher/CourseMark.vue')
+          path: 'aimake',
+          component: () => import('@/views/teacher/AiMake.vue')
         },
         {
-          path: 'processCourse',
-          component: () => import('@/views/teacher/ProcessLeave.vue')
+          path: 'PreDesign',
+          component: () => import('@/views/teacher/PreDesign.vue')
         },
         {
           path: 'questionfork',
