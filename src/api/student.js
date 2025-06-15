@@ -90,18 +90,21 @@ export const getAIAnswerServicemore = (student_id, history, new_query) => {
   })
 }
 
-// 获取作业列表（示例）
-export const getHomeworkListService = (studentId) => {
-  return request.get(`/api/assessment/list/${studentId}`)
+
+export const getHomeworkListService = () => {
+  return request.get(`/api/assessments/list`)
 }
 
-// 获取作业详情（示例）
-export const getHomeworkDetailService = (id) => {
-  return request.get(`/api/assessment/${id}/details`)
+
+export const getHomeworkDetailService = (assessment_id) => {
+  return request.get(`/api/assessments/${assessment_id}/details`)
 }
 
-export const submitHomeworkService = (data) => {
-  return request.post('/homework/submit', {
-    data
+export const submitHomeworkService = (query,student_id,assessment_id) => {
+  request.defaults.timeout = 1000000
+  return request.post('api/assessments/evaluate-answers', {
+    query,
+    student_id,
+    assessment_id
   })
 }

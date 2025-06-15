@@ -24,7 +24,7 @@ const fetchBanks = async () => {
   try {
     loading.value = true
     const response = await getQuestionBanks(userStore.userId)
-    banks.value = response.data || []
+    banks.value = response.data.assessments || []
   } catch (error) {
     ElMessage.error('获取题库失败：' + (error.message || '网络错误'))
     banks.value = []
@@ -37,7 +37,7 @@ const fetchBanks = async () => {
 const handlePublish = async (assessmentId) => {
   try {
     publishingIds.value.push(assessmentId)
-    await publishQuestionBank(assessmentId)
+    await publishQuestionBank(assessmentId,userStore.userId)
     ElMessage.success('发布成功')
     // 可选择刷新列表或更新当前项状态
     fetchBanks()
@@ -63,12 +63,12 @@ onMounted(() => {
       <div
         class="bank-card"
         v-for="bank in sortedBanks"
-        :key="bank.assessment_id"
+        :key="bank.id"
       >
         <div class="bank-info">
           <div class="bank-header">
             <h3 class="bank-title">{{ bank.title }}</h3>
-            <span class="bank-id">题库ID: {{ bank.assessment_id }}</span>
+            <span class="bank-id">题库ID: {{ bank.id }}</span>
           </div>
           <div class="bank-meta">
             <span class="bank-subject"
@@ -83,8 +83,8 @@ onMounted(() => {
         <el-button
           type="primary"
           class="publish-btn"
-          @click="handlePublish(bank.assessment_id)"
-          :loading="publishingIds.includes(bank.assessment_id)"
+          @click="handlePublish(bank.id)"
+          :loading="publishingIds.includes(bank.id)"
         >
           发布
         </el-button>

@@ -139,12 +139,13 @@ export const getStudentcondition = (assessment_id) => {
 
 // 获取题库列表
 export const getQuestionBanks = (teacher_id) => {
-  return request.get(`/teacher/questionBanks/${teacher_id}`)
+  return request.get(`api/teacher/assessments/${teacher_id}`)
 }
 
 // 发布题库
-export const publishQuestionBank = (assessmentId) => {
-  return request.post('/teacher/publishQuestionBank', {
-    assessment_id: assessmentId
+export const publishQuestionBank = (assessment_id,teacher_id) => {
+  return request.post('api/teacher/assessments/publish', {
+    assessment_id: assessment_id,
+    teacher_id:teacher_id
   })
 }
