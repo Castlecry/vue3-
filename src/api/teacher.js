@@ -149,3 +149,13 @@ export const publishQuestionBank = (assessment_id,teacher_id) => {
     teacher_id:teacher_id
   })
 }
+
+// 获取老师发布的试题列表（页面加载时调用）
+export const getTeacherExamsService = (teacherId) => {
+  return request.get(`/api/teacher/exams`, { params: { teacherId } });
+};
+
+// 获取试题学情详情（点击按钮时调用）
+export const getExamAnalysisService = (examId) => {
+  return request.get(`/api/teacher/exams/${examId}/analysis`);
+};

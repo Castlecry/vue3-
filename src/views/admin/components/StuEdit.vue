@@ -8,14 +8,8 @@ import {
 const dialogFormVisible = ref(false)
 // 表单数据
 const formData = ref({
-  id: '',
-  stuNum: '',
   password: '',
-  name: '',
-  sex: '',
-  year: '',
-  major: '',
-  needScore: ''
+  name: ''
 })
 
 //记录新增/修改状态，0为新增
@@ -80,46 +74,15 @@ const rules = {
     required: true,
     message: '名字不能为空',
     trigger: 'blur'
-  },
-  sex: {
-    required: true,
-    message: '性别不能为空',
-    trigger: 'blur'
-  },
-  year: {
-    required: true,
-    message: '年级不能为空',
-    trigger: 'blur'
-  },
-  major: {
-    required: true,
-    message: '专业不能为空',
-    trigger: 'blur'
-  },
-  needScore: {
-    required: true,
-    message: '最大学分不能为空',
-    trigger: 'blur'
   }
 }
-
 //定义成功通知事件
 const emit = defineEmits(['success'])
-
-//处理逻辑
-
-const yearArray = ref([
-  { id: 1, name: '大一' },
-  { id: 2, name: '大二' },
-  { id: 3, name: '大三' },
-  { id: 4, name: '大四' }
-])
 
 // 2.添加 / 修改数据
 const submitData = async () => {
   //1.先进行校验
   await form.value.validate()
-
   //2.根据stuNum来判断是新增还是修改
   try {
     if (status.value == 1) {
@@ -155,10 +118,6 @@ const submitData = async () => {
       class="form-inline"
     >
       <!-- 选择审核人 -->
-      <el-form-item label="学号" prop="stuNum" v-if="status == 0">
-        <el-input v-model="formData.stuNum" placeholder="请输入学号"></el-input>
-      </el-form-item>
-
       <el-form-item label="密码" prop="password">
         <el-input
           v-model="formData.password"
@@ -168,31 +127,6 @@ const submitData = async () => {
       <el-form-item label="姓名" prop="name">
         <el-input v-model="formData.name" placeholder="请输入姓名"></el-input
       ></el-form-item>
-      <el-form-item label="性别" prop="sex">
-        <el-radio-group v-model="formData.sex" class="ml-4">
-          <el-radio label="男" size="large">男</el-radio>
-          <el-radio label="女" size="large">女</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="年级" prop="year" style="width: 100%">
-        <el-select v-model="formData.year" placeholder="请输入年级">
-          <el-option
-            v-for="yearObj in yearArray"
-            :key="yearObj.id"
-            :label="yearObj.name"
-            :value="yearObj.id"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="专业" prop="major">
-        <el-input v-model="formData.major" placeholder="请输入专业"></el-input>
-      </el-form-item>
-      <el-form-item label="毕业所需分数" prop="needScore">
-        <el-input
-          v-model="formData.needScore"
-          placeholder="请输入分数"
-        ></el-input>
-      </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">

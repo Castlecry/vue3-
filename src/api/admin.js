@@ -4,15 +4,6 @@ export const getAdminListService = () => {
   return request.get('/admin/getAdminList')
 }
 
-//管理员个人信息
-export const getInfoService = (userId) => {
-  return request.get('/admin/info', {
-    params: {
-      userId
-    }
-  })
-}
-
 export const adminChangePasswordService = (userId, password) => {
   request.put('/admin/changePassword', {
     userId: userId,
@@ -21,10 +12,12 @@ export const adminChangePasswordService = (userId, password) => {
 }
 
 //学生管理
-export const getStudentListService = (stuName) => {
-  return request.get('/admin/getStudentList', {
+export const getStudentListService = (stuName,page) => {
+  return request.get('api/admin/users', {
     params: {
-      stuName
+      stuName,
+      page,
+      role: 'student'
     }
   })
 }
@@ -37,19 +30,21 @@ export const editStudentService = (student) => {
   return request.put('/admin/editStudent', student)
 }
 
-export const deleteStudentService = (row) => {
-  return request.delete('/admin/deleteStudent', {
+export const deleteStudentService = (stuName) => {
+  return request.delete('api/admin/users', {
     params: {
-      stuNum: row.stuNum
+      stuName,
+      role:'student'
     }
   })
 }
 
 //教师管理
 export const getTeacherListService = (techName) => {
-  return request.get('/admin/getTeacherList', {
+  return request.get('api/admin/users', {
     params: {
-      name: techName
+      name: techName,
+      role: 'teacher'
     }
   })
 }

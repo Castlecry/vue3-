@@ -108,3 +108,20 @@ export const submitHomeworkService = (query,student_id,assessment_id) => {
     assessment_id
   })
 }
+
+export const getStudentExercise = (student_id) => {
+  request.defaults.timeout = 1000000
+  return request.post('/api/student-exercise/get', {
+    student_id // 根据实际接口需求调整参数
+  })
+}
+
+// 新增：提交学生练习答案的方法（假设接口路径为/api/student-exercise/submit）
+export const submitStudentExercise = (student_id, exercise_id, answer) => {
+  request.defaults.timeout = 1000000
+  return request.post('/api/student-exercise/submit', {
+    student_id,
+    exercise_id,
+    answer // 根据实际接口需求调整参数
+  })
+}

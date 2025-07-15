@@ -66,7 +66,7 @@ const router = createRouter({
     {
       path: '/admin',
       component: () => import('@/views/admin/layout/AdmLayout.vue'),
-      redirect: '/admin/info',
+      redirect: '/admin/stuManage',
       children: [
         {
           path: 'info',
@@ -94,6 +94,9 @@ export default router
 // 路由前置守卫
 router.beforeEach((to) => {
   const userStore = useUserStore()
+  if (import.meta.env.DEV) {
+    return true // 允许所有路由访问
+  }
   //如果没有token，且访问非登录页，就跳转回来
   if (!userStore.token && to.path !== '/login') {
     ElMessage({

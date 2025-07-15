@@ -37,10 +37,6 @@ const logout = async () => {
         text-color="#fff"
         router
       >
-        <el-menu-item index="/admin/info">
-          <el-icon><Management /></el-icon>
-          <span>管理员信息</span>
-        </el-menu-item>
         <el-menu-item index="/admin/stuManage">
           <el-icon><Promotion /></el-icon>
           <span>学生管理</span>
@@ -48,10 +44,6 @@ const logout = async () => {
         <el-menu-item index="/admin/teaManage">
           <el-icon><Promotion /></el-icon>
           <span>教师管理</span>
-        </el-menu-item>
-        <el-menu-item index="/admin/processCourse">
-          <el-icon><Promotion /></el-icon>
-          <span>处理开课申请</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
