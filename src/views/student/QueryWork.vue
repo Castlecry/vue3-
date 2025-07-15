@@ -191,4 +191,14 @@ onMounted(() => {
   padding: 20px;
   color: #999;
 }
+
+.submit-btn {
+  margin-top: 10px;
+}
+
+.no-data-tip {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+}
 </style>
