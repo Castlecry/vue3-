@@ -90,18 +90,38 @@ export const getAIAnswerServicemore = (student_id, history, new_query) => {
   })
 }
 
-// 获取作业列表（示例）
-export const getHomeworkListService = (studentId) => {
-  return request.get(`/api/assessment/list/${studentId}`)
+
+export const getHomeworkListService = () => {
+  return request.get(`/api/assessments/list`)
 }
 
-// 获取作业详情（示例）
-export const getHomeworkDetailService = (id) => {
-  return request.get(`/api/assessment/${id}/details`)
+
+export const getHomeworkDetailService = (assessment_id) => {
+  return request.get(`/api/assessments/${assessment_id}/details`)
 }
 
-export const submitHomeworkService = (data) => {
-  return request.post('/homework/submit', {
-    data
+export const submitHomeworkService = (query,student_id,assessment_id) => {
+  request.defaults.timeout = 1000000
+  return request.post('api/assessments/evaluate-answers', {
+    query,
+    student_id,
+    assessment_id
+  })
+}
+
+export const getStudentExercise = (student_id) => {
+  request.defaults.timeout = 1000000
+  return request.post('/api/student-exercise/get', {
+    student_id // 根据实际接口需求调整参数
+  })
+}
+
+// 新增：提交学生练习答案的方法（假设接口路径为/api/student-exercise/submit）
+export const submitStudentExercise = (student_id, exercise_id, answer) => {
+  request.defaults.timeout = 1000000
+  return request.post('/api/student-exercise/submit', {
+    student_id,
+    exercise_id,
+    answer // 根据实际接口需求调整参数
   })
 }

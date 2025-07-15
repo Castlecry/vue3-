@@ -139,12 +139,23 @@ export const getStudentcondition = (assessment_id) => {
 
 // 获取题库列表
 export const getQuestionBanks = (teacher_id) => {
-  return request.get(`/teacher/questionBanks/${teacher_id}`)
+  return request.get(`api/teacher/assessments/${teacher_id}`)
 }
 
 // 发布题库
-export const publishQuestionBank = (assessmentId) => {
-  return request.post('/teacher/publishQuestionBank', {
-    assessment_id: assessmentId
+export const publishQuestionBank = (assessment_id,teacher_id) => {
+  return request.post('api/teacher/assessments/publish', {
+    assessment_id: assessment_id,
+    teacher_id:teacher_id
   })
 }
+
+// 获取老师发布的试题列表（页面加载时调用）
+export const getTeacherExamsService = (teacherId) => {
+  return request.get(`/api/teacher/exams`, { params: { teacherId } });
+};
+
+// 获取试题学情详情（点击按钮时调用）
+export const getExamAnalysisService = (examId) => {
+  return request.get(`/api/teacher/exams/${examId}/analysis`);
+};
