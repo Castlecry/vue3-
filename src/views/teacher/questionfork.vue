@@ -60,11 +60,8 @@ onMounted(() => {
   <PageContainer title="题库管理">
     <div class="question-bank-container">
       <!-- 题库卡片列表 -->
-      <div
-        class="bank-card"
-        v-for="bank in sortedBanks"
-        :key="bank.id"
-      >
+      <div class="bank-card" v-for="bank in sortedBanks" :key="bank.id">
+
         <div class="bank-info">
           <div class="bank-header">
             <h3 class="bank-title">{{ bank.title }}</h3>

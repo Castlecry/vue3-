@@ -5,14 +5,11 @@
       v-loading="isLoading"
       :data="homeworkList"
       style="width: 100%"
-      :row-key="row => row.id"
+      :row-key="(row) => row.id"
       @expand-change="handleExpandChange"
       class="homework-table"
     >
-      <el-table-column
-        type="expand"
-        width="50"
-      >
+      <el-table-column type="expand" width="50">
         <template #default="{ row }">
           <!-- 作业详情展开内容 -->
           <div class="homework-detail">
@@ -39,11 +36,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="title"
-        label="作业标题"
-        align="center"
-      />
+      <el-table-column prop="title" label="作业标题" align="center" />
     </el-table>
     <!-- 无数据提示 -->
     <div v-if="!isLoading && homeworkList.length === 0" class="no-data-tip">
@@ -116,7 +109,8 @@ const handleSubmit = async (homeworkId) => {
       homeworkId // 需替换为实际学生ID，比如从store中取homeworkId
     )
     console.log(res)
-    if (res.status === 200) { // 假设接口返回code=200表示成功，根据实际接口调整
+    if (res.status === 200) {
+      // 假设接口返回code=200表示成功，根据实际接口调整
       ElMessage.success('提交成功')
       submitContents.value[homeworkId] = '' // 清空答案
     } else {
@@ -186,6 +180,16 @@ onMounted(() => {
   resize: vertical;
   font-size: 14px;
   color: #333;
+}
+
+.submit-btn {
+  margin-top: 10px;
+}
+
+.no-data-tip {
+  text-align: center;
+  padding: 20px;
+  color: #999;
 }
 
 .submit-btn {
