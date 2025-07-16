@@ -47,7 +47,7 @@ const logout = async () => {
         </el-menu-item>
         <el-menu-item index="/student/onlinepractise">
           <el-icon><Promotion /></el-icon>
-          <span>在线练习</span>
+          <span>实时练习评测助手</span>
         </el-menu-item>
         <el-menu-item index="/student/queryWork">
           <el-icon><Promotion /></el-icon>

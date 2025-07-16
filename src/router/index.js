@@ -95,7 +95,17 @@ const router = createRouter({
         {
           path: 'plan',
           component: () => import('@/views/admin/plan.vue'),
-        }
+        },
+        {
+          path: 'overview',
+          name: 'Overview',
+          component: () => import('@/views/admin/overview/Overview.vue'), // 新增父组件
+          children: [
+          { path: 'user-activity', component: () => import('@/views/admin/overview/userActivity.vue') },
+          { path: 'teaching-efficiency', component: () => import('@/views/admin/overview/teachingEfficiency.vue') },
+          { path: 'learning-effect', component: () => import('@/views/admin/overview/learningEffect.vue') }
+  ]
+}
       ]
     }
   ]
