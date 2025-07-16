@@ -1,131 +1,3 @@
-<script setup>
-import PageContainer from '@/components/PageContainer.vue'
-import { ref, onMounted, nextTick } from 'vue'
-import { useUserStore } from '@/stores/user'
-import { ElMessage } from 'element-plus'
-import { Loading } from '@element-plus/icons-vue' // 导入加载图标
-import { ElIcon } from 'element-plus' // 导入图标组件
-import { getStudentExercise, submitStudentExercise } from '@/api/student.js'
-
-// 获取当前时间（HH:MM格式）
-const getCurrentTime = () => {
-  const time = new Date().toTimeString().slice(0, 5)
-  return time
-}
-
-// 消息列表
-const messages = ref([
-  {
-    role: 'assistant',
-    content: '你好！我是你的智能助手，有什么可以帮你解答的？',
-    time: ''
-  }
-])
-
-// 输入框内容
-const inputText = ref('')
-let qa_id = ref(null)
-// 消息容器引用
-const chatContainer = ref(null)
-
-// 组件挂载时设置初始消息时间并滚动到底部
-onMounted(() => {
-  messages.value[0].time = getCurrentTime()
-  scrollToBottom()
-})
-
-// 发送消息
-const sendMessage = async () => {
-  if (!inputText.value.trim()) {
-    ElMessage.warning('请输入消息内容')
-    return
-  }
-
-  const userQuestion = inputText.value.trim()
-
-  // 添加用户消息
-  messages.value.push({
-    role: 'user',
-    content: userQuestion,
-    time: getCurrentTime()
-  })
-
-  // 添加加载中的临时消息
-  const thinkingMsgId = messages.value.length // 记录临时消息位置
-  messages.value.push({
-    role: 'assistant',
-    content: '正在为您思考如何解决…………',
-    time: getCurrentTime(),
-    isLoading: true // 标记为加载状态
-  })
-  isThinking.value = true
-
-  try {
-    const userStore = useUserStore()
-    let response
-
-    if (qaHistory.value.length === 0) {
-      // 替换为学生端获取练习的方法
-      response = await getStudentExercise(userStore.userId, userQuestion)
-    } else {
-      // 替换为学生端提交练习的方法
-      response = await submitStudentExercise(
-        userStore.userId,
-        qaHistory.value,
-        userQuestion,
-        qa_id.value
-      )
-    }
-    qa_id.value = response.data.teaching_plan_id
-    const aiAnswer = response.data.generated_plan_content
-
-    // 替换临时消息为实际回答
-    messages.value[thinkingMsgId] = {
-      role: 'assistant',
-      content: '回答如下:' + aiAnswer,
-      time: getCurrentTime()
-    }
-
-    // 维护历史问答
-    qaHistory.value.push({
-      role: 'user',
-      content: userQuestion
-    })
-    qaHistory.value.push({
-      role: 'assistant',
-      content: aiAnswer
-    })
-  } catch (error) {
-    console.error('获取回答失败', error)
-    ElMessage.error('获取回答失败，请重试')
-    // 替换临时消息为错误提示
-    messages.value[thinkingMsgId] = {
-      role: 'assistant',
-      content: '抱歉，当前回答遇到问题，请重试',
-      time: getCurrentTime()
-    }
-  } finally {
-    inputText.value = ''
-    isThinking.value = false
-    await nextTick()
-    scrollToBottom()
-  }
-}
-
-// 滚动到底部
-const scrollToBottom = () => {
-  if (chatContainer.value) {
-    chatContainer.value.scrollTop = chatContainer.value.scrollHeight
-  }
-}
-
-// 存储历史问答对
-const qaHistory = ref([])
-
-// 新增：加载状态（思考中）
-const isThinking = ref(false)
-</script>
-
 <template>
   <PageContainer title="智能学习助手小C">
     <!-- 消息显示区域 -->
@@ -137,7 +9,7 @@ const isThinking = ref(false)
             <img
               src="@/assets/ai.png"
               alt="AI头像"
-              style="width: 100%; height: 100%; border-radius: 50%"
+              style="width: 32px; height: 32px; border-radius: 50%"
             />
           </div>
           <div class="content">
@@ -146,8 +18,39 @@ const isThinking = ref(false)
               <el-icon><Loading /></el-icon>
               <span>{{ msg.content }}</span>
             </div>
+            
+            <!-- 非加载状态，根据数据类型渲染 -->
             <div v-else class="text">
-              {{ msg.content }}
+              <!-- 渲染基础回答 -->
+              <div v-if="msg.content" class="base-answer">
+                {{ msg.content }}
+              </div>
+              
+              <!-- 第一次请求返回的内容 -->
+              <div v-if="msg.generatedQuestions" class="questions-container">
+                <h4>生成的练习题</h4>
+                <div class="question-item">
+                  <p>{{ msg.generatedQuestions.question_text }}</p>
+                </div>
+              </div>
+              
+              <!-- 后续请求返回的内容 -->
+              <div v-if="msg.newQuestions" class="questions-container">
+                <h4>生成的练习题</h4>
+                <div class="question-item">
+                  <p>{{ msg.newQuestions.generated_questions.question_text }}</p>
+                </div>
+              </div>
+              
+              <!-- 反馈内容 -->
+              <div v-if="msg.feedback" class="feedback-container">
+                <h4>学习反馈</h4>
+                <p>{{ msg.feedback.overall_comment }}</p>
+                <div v-if="msg.feedback.feedback_details" class="feedback-details">
+                  <h5>反馈详情:</h5>
+                  <p>{{ msg.feedback.feedback_details }}</p>
+                </div>
+              </div>
             </div>
             <div class="time">{{ msg.time }}</div>
           </div>
@@ -178,6 +81,154 @@ const isThinking = ref(false)
     </div>
   </PageContainer>
 </template>
+
+<script setup>
+import PageContainer from '@/components/PageContainer.vue'
+import { ref, onMounted, nextTick } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { getAIAnswerService1, getAIAnswerService1more } from '@/api/student.js'
+import { ElMessage } from 'element-plus'
+import { Loading } from '@element-plus/icons-vue'
+import { ElIcon } from 'element-plus'
+
+// 获取当前时间（HH:MM格式）
+const getCurrentTime = () => {
+  const time = new Date().toTimeString().slice(0, 5)
+  return time
+}
+
+// 消息列表
+const messages = ref([
+  {
+    role: 'assistant',
+    content: '你好！我是你的智能助手，有什么可以帮你解答的？',
+    time: ''
+  }
+])
+
+// 输入框内容
+const inputText = ref('')
+let qa_id = ref(null)
+// 消息容器引用
+const chatContainer = ref(null)
+// 加载状态
+const isThinking = ref(false)
+// 历史记录
+const qaHistory = ref([])
+
+// 组件挂载时设置初始消息时间并滚动到底部
+onMounted(() => {
+  messages.value[0].time = getCurrentTime()
+  scrollToBottom()
+})
+
+// 发送消息
+const sendMessage = async () => {
+  if (!inputText.value.trim()) {
+    ElMessage.warning('请输入消息内容')
+    return
+  }
+
+  const userQuestion = inputText.value.trim()
+
+  // 添加用户消息
+  messages.value.push({
+    role: 'user',
+    content: userQuestion,
+    time: getCurrentTime()
+  })
+
+  // 添加加载中的临时消息
+  const thinkingMsgId = messages.value.length
+  messages.value.push({
+    role: 'assistant',
+    content: '正在为您思考如何解决…………',
+    time: getCurrentTime(),
+    isLoading: true
+  })
+  isThinking.value = true
+
+  try {
+    const userStore = useUserStore()
+    let response, isFirstRequest
+
+    // 判断是否为第一次请求
+    if (qaHistory.value.length === 0) {
+      isFirstRequest = true
+      response = await getAIAnswerService1(userStore.userId, userQuestion)
+    } else {
+      isFirstRequest = false
+      response = await getAIAnswerService1more(
+        userStore.userId,
+        qaHistory.value,
+        userQuestion,
+        qa_id.value
+      )
+    }
+
+    // 处理响应数据
+    const aiMsg = {
+      role: 'assistant',
+      time: getCurrentTime(),
+      isLoading: false
+    }
+
+    if (isFirstRequest) {
+      // 第一次请求 - 渲染完整数据
+      aiMsg.content = "这是第一次回答"
+      aiMsg.generatedQuestions = response.data.generated_questions
+      qa_id.value = response.data.catalog_id
+    } else {
+      // 后续请求 - 只渲染非空的new_questions或feedback
+      aiMsg.content = response.data.assistant_response_text
+      
+      if (response.data.new_questions) {
+        aiMsg.newQuestions = response.data.new_questions
+      }
+      
+      if (response.data.feedback) {
+        aiMsg.feedback = response.data.feedback
+      }
+    }
+
+    // 替换临时消息为实际回答
+    messages.value[thinkingMsgId] = aiMsg
+
+    // 维护历史问答
+    qaHistory.value.push({
+      role: 'user',
+      content: userQuestion
+    })
+    qaHistory.value.push({
+      role: 'assistant',
+      content: aiMsg.content
+    })
+
+  } catch (error) {
+    console.error('获取回答失败', error)
+    ElMessage.error('获取回答失败，请重试')
+    // 替换临时消息为错误提示
+    messages.value[thinkingMsgId] = {
+      role: 'assistant',
+      content: '抱歉，当前回答遇到问题，请重试',
+      time: getCurrentTime(),
+      isLoading: false
+    }
+  } finally {
+    inputText.value = ''
+    isThinking.value = false
+    await nextTick()
+    scrollToBottom()
+  }
+}
+
+// 滚动到底部
+const scrollToBottom = () => {
+  if (chatContainer.value) {
+    chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+  }
+}
+</script>
 
 <style scoped lang="scss">
 .chat-container {
@@ -210,7 +261,7 @@ const isThinking = ref(false)
 .avatar {
   width: 32px;
   height: 32px;
-  flex-shrink: 0; /* 防止头像因父容器收缩被压缩 */
+  flex-shrink: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -263,23 +314,23 @@ const isThinking = ref(false)
 
 .input {
   flex-grow: 1;
-  height: 40px; /* 增加输入框高度 */
+  height: 40px;
   .el-input__inner {
-    border-radius: 20px; /* 输入框圆角 */
-    padding: 0 20px; /* 调整内边距 */
+    border-radius: 20px;
+    padding: 0 20px;
     font-size: 14px;
   }
 }
 
 .send-btn {
   white-space: nowrap;
-  height: 40px; /* 与输入框高度一致 */
-  padding: 0 24px; /* 增加按钮内边距 */
-  border-radius: 20px; /* 按钮圆角 */
-  background: #1677ff; /* 主色背景 */
+  height: 40px;
+  padding: 0 24px;
+  border-radius: 20px;
+  background: #1677ff;
   border: none;
   &:hover {
-    background: #4096ff; /* 悬停颜色 */
+    background: #4096ff;
   }
 }
 </style>

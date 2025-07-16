@@ -89,7 +89,7 @@ export const rejectApplyLeaveService = (cst) => {
 // 智能助手获取回答
 export const getAIAnswerService = (teacher_id, query) => {
   request.defaults.timeout = 1000000
-  return request.post('/api/teaching-qa', {
+  return request.post('/api/teaching-plans', {
     teacher_id,
     query
   })
@@ -102,7 +102,7 @@ export const getAIAnswerServicemore = (
   base_teaching_plan_id
 ) => {
   request.defaults.timeout = 1000000
-  return request.post('/api/teaching-qa/refine', {
+  return request.post('/api/teaching-plans/refine', {
     teacher_id,
     history,
     new_query,
@@ -112,7 +112,7 @@ export const getAIAnswerServicemore = (
 // 智能助手获取回答考核生成
 export const getAIAnswerService1 = (teacher_id, query) => {
   request.defaults.timeout = 1000000
-  return request.post('/api/assements/generate', {
+  return request.post('/api/assessments/generate', {
     teacher_id,
     query
   })
@@ -122,14 +122,14 @@ export const getAIAnswerService1more = (
   teacher_id,
   history,
   new_query,
-  base_teaching_plan_id
+  base_assessment_id
 ) => {
   request.defaults.timeout = 1000000
-  return request.post('/api/accessments/refine', {
+  return request.post('/api/assessments/refine', {
     teacher_id,
     history,
     new_query,
-    base_teaching_plan_id
+    base_assessment_id
   })
 }
 //学情评估展示，在teacher的CourseManage页面
@@ -151,11 +151,12 @@ export const publishQuestionBank = (assessment_id,teacher_id) => {
 }
 
 // 获取老师发布的试题列表（页面加载时调用）
-export const getTeacherExamsService = (teacherId) => {
-  return request.get(`/api/teacher/exams`, { params: { teacherId } });
+export const getTeacherExamsService = (teacher_id) => {
+  return request.get(`/api/teacher/${teacher_id}/published-assessments`);
 };
 
 // 获取试题学情详情（点击按钮时调用）
-export const getExamAnalysisService = (examId) => {
-  return request.get(`/api/teacher/exams/${examId}/analysis`);
+export const getExamAnalysisService = (assessment_id) => {
+  request.defaults.timeout = 1000000
+  return request.get(`/api/assessments/${assessment_id}/analysis`);
 };

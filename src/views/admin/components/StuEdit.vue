@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import {
   addStudentService,
   editStudentService,
-  getStudentListService
 } from '@/api/admin.js'
 const dialogFormVisible = ref(false)
 // 表单数据
@@ -14,16 +14,6 @@ const formData = ref({
 
 //记录新增/修改状态，0为新增
 const status = ref(0)
-
-//学生学号集合，用于判断是否有重复学号
-const stuNumList = ref([])
-const getStuNumList = async () => {
-  const resp = await getStudentListService()
-  const studentList = resp.data
-  // console.log(studentList)
-  stuNumList.value = studentList.map((student) => student.stuNum)
-}
-getStuNumList()
 
 // 定义打开函数
 const open = (row) => {
@@ -45,26 +35,6 @@ defineExpose({ open })
 const form = ref(null)
 
 const rules = {
-  stuNum: [
-    {
-      required: true,
-      message: '学生学号不能为空',
-      trigger: 'blur'
-    },
-    {
-      validator: (rule, value, callback) => {
-        if (
-          stuNumList.value.includes(formData.value.stuNum) &&
-          status.value == 0
-        ) {
-          callback(new Error('学生学号不应该重复'))
-        } else {
-          callback()
-        }
-      },
-      trigger: 'blur'
-    }
-  ],
   password: {
     required: true,
     message: '密码不能为空',
@@ -91,7 +61,10 @@ const submitData = async () => {
       ElMessage.success('修改学生信息成功')
     } else {
       //新增
-      await addStudentService(formData.value)
+      await addStudentService(
+        formData.value.name,
+        formData.value.password
+      )
       ElMessage.success('新增学生信息成功')
     }
   } catch (err) {

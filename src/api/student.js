@@ -109,19 +109,43 @@ export const submitHomeworkService = (query,student_id,assessment_id) => {
   })
 }
 
-export const getStudentExercise = (student_id) => {
+export const getStudentExercise = (student_id,query) => {
   request.defaults.timeout = 1000000
-  return request.post('/api/student-exercise/get', {
-    student_id // 根据实际接口需求调整参数
+  return request.post('/api/practice-questions/generate', {
+    student_id,
+    query// 根据实际接口需求调整参数
   })
 }
 
 // 新增：提交学生练习答案的方法（假设接口路径为/api/student-exercise/submit）
 export const submitStudentExercise = (student_id, exercise_id, answer) => {
   request.defaults.timeout = 1000000
-  return request.post('/api/student-exercise/submit', {
+  return request.post('/api/practice-assistant/chat', {
     student_id,
     exercise_id,
     answer // 根据实际接口需求调整参数
+  })
+}
+
+export const getAIAnswerService1 = (student_id, query) => {
+  request.defaults.timeout = 1000000
+  return request.post('/api/practice-questions/generate', {
+    student_id,
+    query
+  })
+}
+
+export const getAIAnswerService1more = (
+  student_id,
+  history,
+  new_query,
+  active_catalog_id
+) => {
+  request.defaults.timeout = 1000000
+  return request.post('/api/practice-assistant/chat', {
+    student_id,
+    history,
+    new_query,
+    active_catalog_id
   })
 }

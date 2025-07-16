@@ -4,90 +4,72 @@ export const getAdminListService = () => {
   return request.get('/admin/getAdminList')
 }
 
-export const adminChangePasswordService = (userId, password) => {
-  request.put('/admin/changePassword', {
-    userId: userId,
-    password: password
-  })
-}
-
 //学生管理
-export const getStudentListService = (stuName,page) => {
+export const getStudentListService = (params) => {
   return request.get('api/admin/users', {
     params: {
-      stuName,
-      page,
+      search: params.search, // 从对象中取search
+      page: params.page,       // 从对象中取 page
       role: 'student'
     }
   })
 }
 
-export const addStudentService = (student) => {
-  return request.post('/admin/addStudent', student)
-}
+export const updateStudentPasswordService = (id, password) => {
+  return request.put(`api/admin/users/student/${id}/reset-password`, null, {
+    params: { password }  // 明确将password作为查询参数
+  })
+};
 
-export const editStudentService = (student) => {
-  return request.put('/admin/editStudent', student)
-}
+export const updateTeacherPasswordService = (id, password) => {
+  return request.put(`api/admin/users/teacher/${id}/reset-password`, null, {
+    params: { password }  // 明确将password作为查询参数
+  })
+};
 
-export const deleteStudentService = (stuName) => {
-  return request.delete('api/admin/users', {
-    params: {
-      stuName,
+export const addStudentService = (username,password) => {
+  return request.post('api/admin/users',  {
+      username,
+      password,
       role:'student'
-    }
   })
 }
 
+export const editStudentService = (username,password) => {
+  return request.put('api/admin/editStudent', {
+      username,
+      password,
+      role:'student'
+  })
+}
+
+export const deleteStudentService = (id) => {
+  return request.delete(`api/admin/users/student/${id}`);
+}
+
 //教师管理
-export const getTeacherListService = (techName) => {
+export const getTeacherListService = (params) => {
   return request.get('api/admin/users', {
     params: {
-      name: techName,
+      search: params.search, // 从对象中取search
+      page: params.page,       // 从对象中取 page
       role: 'teacher'
     }
   })
 }
 
-export const addTeacherService = (teacher) => {
-  return request.post('/admin/addTeacher', teacher)
+export const addTeacherService = (username,password) => {
+  return request.post('api/admin/users',  {
+      username,
+      password,
+      role:'teacher'
+  })
 }
 
 export const editTeacherService = (teacher) => {
   return request.put('/admin/editTeacher', teacher)
 }
 
-export const deleteTeacherService = (row) => {
-  return request.delete('/admin/deleteTeacher', {
-    params: {
-      techNum: row.techNum
-    }
-  })
-}
-
-//处理开课请求
-
-//获取open表列表
-export const getWaitOpenListService = (userId) => {
-  return request.get('/admin/getWaitOpenList', {
-    params: {
-      userId
-    }
-  })
-}
-
-//批准课程
-export const permitCourseService = (row) => {
-  return request.post('/admin/permitCourse', row)
-}
-
-//撤销课程
-export const deleteCourseService = (row) => {
-  return request.delete('/admin/deleteCourse', {
-    params: {
-      adminNum: row.adminNum,
-      courseNum: row.courseNum,
-      techNum: row.techNum
-    }
-  })
+export const deleteTeacherService = (id) => {
+  return request.delete(`api/admin/users/teacher/${id}`);
 }

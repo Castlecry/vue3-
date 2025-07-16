@@ -33,19 +33,69 @@
             :class="{ 'expanded': expandedExamIds.includes(exam.id) }"
           >
             <div v-if="analysisLoading[exam.id]" class="loading-skeleton">
-              <el-skeleton animated :rows="5" />
+              <el-skeleton animated :rows="8" />
             </div>
             
-            <div v-else-if="examAnalysis[exam.id] && examAnalysis[exam.id].length > 0" class="analysis-data">
-              <h4 class="analysis-title">学生答题情况</h4>
-              <div v-for="(student, index) in examAnalysis[exam.id]" :key="index" class="student-item">
-                <div class="student-info">
-                  <span class="student-name">{{ student.studentName }}</span>
-                  <span class="correct-rate">正确率: {{ student.correctRate }}%</span>
+            <!-- 正确展示新结构的学情分析数据 -->
+            <div v-else-if="examAnalysis[exam.id]" class="analysis-data">
+              <!-- 考核标题 -->
+              <h4 class="analysis-title">{{ examAnalysis[exam.id].assessment_title }}</h4>
+              
+              <!-- 总体评价 -->
+              <div class="overall-summary">
+                <p><strong>总体评价：</strong>{{ examAnalysis[exam.id].overall_summary }}</p>
+              </div>
+              
+              <!-- 强弱项分析 -->
+              <div class="strength-weakness">
+                <div class="section">
+                  <h5>学生优势</h5>
+                  <ul>
+                    <li v-for="(point, idx) in examAnalysis[exam.id].strength_points" :key="idx">
+                      {{ point }}
+                    </li>
+                  </ul>
                 </div>
-                <div class="question-summary">
-                  <span>正确题数: {{ student.correctCount }}/{{ student.totalCount }}</span>
+                <div class="section">
+                  <h5>薄弱环节</h5>
+                  <ul>
+                    <li v-for="(point, idx) in examAnalysis[exam.id].weakness_points" :key="idx">
+                      {{ point }}
+                    </li>
+                  </ul>
                 </div>
+              </div>
+              
+              <!-- 问题题目分析 -->
+              <div class="problematic-questions">
+                <h5>重点问题分析</h5>
+                <div v-for="(question, qIdx) in examAnalysis[exam.id].problematic_questions" :key="qIdx" class="question-item">
+                  <div class="question-text">
+                    <p><strong>{{ question.question_identifier }}：</strong>{{ question.question_text.split('\n')[0] }}</p>
+                    <div class="options">
+                      <div v-for="(opt, oIdx) in question.question_text.split('\n').slice(1)" :key="oIdx">
+                        {{ opt }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="question-meta">
+                    <span class="correct-rate">正确率：{{ question.correct_rate * 100 }}%</span>
+                    <span class="knowledge-point">知识点：{{ question.main_knowledge_point }}</span>
+                  </div>
+                  <div class="error-analysis">
+                    <p><strong>错误分析：</strong>{{ question.common_error_analysis }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 教学建议 -->
+              <div class="teaching-suggestions">
+                <h5>教学建议</h5>
+                <ol>
+                  <li v-for="(suggestion, sIdx) in examAnalysis[exam.id].teaching_suggestions" :key="sIdx">
+                    {{ suggestion }}
+                  </li>
+                </ol>
               </div>
             </div>
             
@@ -72,7 +122,7 @@ import { useUserStore } from '@/stores/user'
 
 // 响应式数据
 const examList = ref([]) // 试题列表
-const examAnalysis = ref({}) // 试题分析数据
+const examAnalysis = ref({}) // 试题分析数据（修改为对象存储，键为examId）
 const isLoading = ref(true) // 全局加载状态
 const expandedExamIds = ref([]) // 展开的试题ID
 const analysisLoading = ref({}) // 学情分析加载状态
@@ -82,8 +132,8 @@ const fetchTeacherExams = async () => {
   isLoading.value = true
   try {
     const userStore = useUserStore()
-    const res = await getTeacherExamsService({ teacherId: userStore.userId })
-    examList.value = res.data.exams || []
+    const res = await getTeacherExamsService(userStore.userId )
+    examList.value = res.data || []
   } catch (error) {
     ElMessage.error('获取试题列表失败，请稍后重试')
     console.error('获取试题列表失败', error)
@@ -98,8 +148,9 @@ const getExamAnalysis = async (examId) => {
   
   analysisLoading.value[examId] = true
   try {
-    const res = await getExamAnalysisService({ examId })
-    examAnalysis.value[examId] = res.data.students || []
+    const res = await getExamAnalysisService(examId)
+    // 直接存储后端返回的完整分析数据
+    examAnalysis.value[examId] = res.data
     
     // 自动展开查看学情
     if (!expandedExamIds.value.includes(examId)) {
@@ -160,7 +211,7 @@ onMounted(() => {
 
 .exam-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(800px, 1fr));
   gap: 20px;
 }
 
@@ -193,7 +244,7 @@ onMounted(() => {
 }
 
 .analysis-content {
-  padding: 20px;
+  padding: 0;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.5s ease, padding 0.3s ease;
@@ -201,20 +252,79 @@ onMounted(() => {
 }
 
 .analysis-content.expanded {
-  max-height: 500px;
+  max-height: 1500px;
   padding: 20px;
 }
 
 .analysis-title {
-  font-size: 16px;
+  font-size: 18px;
   color: #303133;
-  font-weight: 500;
-  margin: 0 0 15px 0;
+  font-weight: 600;
+  margin: 0 0 20px 0;
   padding-bottom: 10px;
-  border-bottom: 1px solid #ebeef5;
+  border-bottom: 2px solid #42b983;
 }
 
-.student-item {
+.overall-summary {
+  background-color: #f0f9f0;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.strength-weakness {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.strength-weakness .section {
+  flex: 1;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.strength-weakness h5 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.strength-weakness .section:first-child h5 {
+  color: #42b983;
+}
+
+.strength-weakness .section:last-child h5 {
+  color: #e74c3c;
+}
+
+.strength-weakness ul {
+  padding-left: 20px;
+  margin-bottom: 0;
+}
+
+.strength-weakness li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.problematic-questions {
+  margin-bottom: 20px;
+}
+
+.problematic-questions h5 {
+  font-size: 16px;
+  color: #303133;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.question-item {
   background: #fff;
   border-radius: 8px;
   padding: 15px;
@@ -222,31 +332,67 @@ onMounted(() => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.student-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.question-text {
   margin-bottom: 10px;
 }
 
-.student-name {
-  font-size: 16px;
-  color: #303133;
-  font-weight: 500;
+.question-text p {
+  margin: 0 0 10px 0;
+  line-height: 1.6;
+}
+
+.options {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.options div {
+  margin-bottom: 5px;
+}
+
+.question-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
 }
 
 .correct-rate {
-  font-size: 14px;
-  color: #00b42a;
-  background: #ecfdf5;
-  padding: 2px 8px;
-  border-radius: 4px;
+  color: #e74c3c;
   font-weight: 500;
 }
 
-.question-summary {
+.knowledge-point {
+  color: #2c3e50;
+}
+
+.error-analysis {
+  background-color: #fff8e6;
+  padding: 12px;
+  border-radius: 6px;
   font-size: 14px;
-  color: #606266;
+}
+
+.teaching-suggestions {
+  background-color: #f0f7ff;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.teaching-suggestions h5 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.teaching-suggestions ol {
+  padding-left: 20px;
+  margin-bottom: 0;
+}
+
+.teaching-suggestions li {
+  margin-bottom: 10px;
+  line-height: 1.6;
 }
 
 .no-analysis-data {
