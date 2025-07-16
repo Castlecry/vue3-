@@ -2,15 +2,6 @@
   <PageContainer :title="`${subjectName} - 教案详情`">
     <template #extra>
       <div class="header">
-        <!-- 占位导出按钮（暂不实现功能） -->
-        <el-button
-          type="primary"
-          :icon="Download"
-          disabled
-          tooltip="功能开发中"
-        >
-          导出教案
-        </el-button>
         <el-button
           type="default"
           style="margin-left: 20px"
@@ -72,15 +63,14 @@
             详情
           </el-button>
           
-          <!-- 导出按钮：占位（暂不实现功能） -->
+          <!-- 导出单个教案按钮 -->
           <el-button
             type="success"
             :icon="Download"
             circle
             plain
             style="margin-left: 8px"
-            disabled
-            tooltip="导出功能开发中"
+            @click="exportSinglePlan(row.resource_type, row.id)"
           >
             导出
           </el-button>
@@ -121,10 +111,10 @@
 <script setup>
 import PageContainer from '@/components/PageContainer.vue'
 import { ref, onMounted } from 'vue'
-import { Download, Document } from '@element-plus/icons-vue' // 修改为Document图标
+import { Download, Document } from '@element-plus/icons-vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getTeachingPlansService } from '@/api/admin.js'
-import { ElMessage } from 'element-plus'
+import { getTeachingPlansService, exportwenjian } from '@/api/admin.js'
+import { ElMessage, ElLoading } from 'element-plus'
 // 引入Pinia存储
 import { useSubjectStore } from '@/stores/subjectStore'
 import { usePlanStore } from '@/stores/planStore'
@@ -146,7 +136,9 @@ const getPlanList = async () => {
   isLoading.value = true
   try {
     const resp = await getTeachingPlansService(
-      subjectName
+      subjectName,
+      currentPage.value,
+      pageSize.value
     )
     planList.value = resp.data.resources//resource_type,id,title
     total.value = resp.data.total
@@ -174,8 +166,6 @@ const handleNextPage = () => {
   }
 }
 
-
-
 // 跳转至教案详情页
 const goToPlanDetail = (resource_type,id) => {
     planStore.setPlanInfo(resource_type, id)
@@ -185,6 +175,61 @@ const goToPlanDetail = (resource_type,id) => {
 // 返回学科列表页
 const goBack = () => {
   router.push('/admin/resourcesManage')
+}
+
+// 导出单个教案
+const exportSinglePlan = async (resource_type, resource_id) => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: '正在导出教案...',
+    background: 'rgba(0, 0, 0, 0.1)'
+  })
+  
+  try {
+    // 1. 调用接口，明确设置响应类型为blob
+    const response = await exportwenjian(resource_type, resource_id, {
+      responseType: 'blob' // 确保获取二进制流
+    })
+    
+    // 2. 从响应头解析文件名（关键：获取后端返回的title相关文件名）
+    const contentDisposition = response.headers['content-disposition']
+    if (!contentDisposition) {
+      throw new Error('未获取到文件名信息')
+    }
+    
+    // 解析并解码文件名（处理UTF-8编码的文件名）
+    const filenameMatch = contentDisposition.match(/filename\*=UTF-8''(.*)/)
+    if (!filenameMatch) {
+      throw new Error('文件名格式解析失败')
+    }
+    const fileName = decodeURIComponent(filenameMatch[1]) // 解码URL编码的文件名
+    
+    // 3. 处理文件流并创建下载链接
+    const blob = new Blob([response.data], { 
+      type: response.headers['content-type'] || 'text/csv;charset=utf-8;' 
+    })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName // 使用后端返回的文件名
+    
+    // 4. 触发下载并清理资源
+    document.body.appendChild(link)
+    link.click()
+    
+    // 延迟清理，避免浏览器尚未处理完下载就移除元素
+    setTimeout(() => {
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    }, 100)
+    
+    ElMessage.success('教案导出成功')
+  } catch (error) {
+    console.error('导出失败:', error)
+    ElMessage.error(error.message || '教案导出失败，请重试')
+  } finally {
+    loading.close()
+  }
 }
 
 // 初始化加载

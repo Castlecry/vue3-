@@ -85,3 +85,7 @@ export const getTeachingPlansService = (subject) => {
 export const getPlanContentService = (resource_type,resource_id) => {
   return request.get(`api/admin/resources/${resource_type}/${resource_id}`);
 }
+
+export const exportwenjian = (resource_type,resource_id) => {
+  return request.get(`api/admin/resources/${resource_type}/${resource_id}/export`);
+}
