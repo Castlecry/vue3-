@@ -66,7 +66,7 @@ const router = createRouter({
     {
       path: '/admin',
       component: () => import('@/views/admin/layout/AdmLayout.vue'),
-      redirect: '/admin/stuManage',
+      redirect: '/admin/overview/userActivity',
       children: [
         {
           path: 'info',

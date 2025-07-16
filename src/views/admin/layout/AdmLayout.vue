@@ -5,7 +5,7 @@ import { logoutService } from '@/api/login.js'
 import { useRouter } from 'vue-router'
 
 // 新增：导入大屏相关图标（使用更贴合的图标）
-import { Management, Promotion, Monitor, PieChart} from '@element-plus/icons-vue'
+import { Promotion } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 // 设置用户名字
@@ -33,30 +33,30 @@ const logout = async () => {
         :default-active="$route.path"
         text-color="#fff"
         router
-        :collapse-transition="false"  <!-- 优化折叠动画 -->
+        :collapse-transition="false" 
       >
         <!-- 新增：大屏概览（父菜单） -->
         <el-sub-menu index="/admin/overview">  <!-- 父菜单唯一标识 -->
           <template #title>
-            <el-icon><Monitor /></el-icon>  <!-- 大屏图标 -->
+            <el-icon><Promotion /></el-icon>  <!-- 大屏图标 -->
             <span>大屏概览</span>
           </template>
           
           <!-- 子菜单1：用户活跃度 -->
           <el-menu-item index="/admin/overview/userActivity">
-            <el-icon><PieChart /></el-icon>  <!-- 活跃度图标 -->
+            <el-icon><Promotion /></el-icon>  <!-- 活跃度图标 -->
             <span>用户活跃度</span>
           </el-menu-item>
           
           <!-- 子菜单2：教学效率 -->
           <el-menu-item index="/admin/overview/teachingEfficiency">
-            <el-icon><PieChart /></el-icon>  <!-- 效率图标 -->
+            <el-icon><Promotion /></el-icon>  <!-- 效率图标 -->
             <span>教学效率</span>
           </el-menu-item>
           
           <!-- 子菜单3：学习效果 -->
           <el-menu-item index="/admin/overview/learningEffect">
-            <el-icon><PieChart /></el-icon>  <!-- 效果图标 -->
+            <el-icon><Promotion /></el-icon>  <!-- 效果图标 -->
             <span>学习效果</span>
           </el-menu-item>
         </el-sub-menu>

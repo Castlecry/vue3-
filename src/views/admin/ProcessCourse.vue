@@ -5,7 +5,6 @@ import { formatTime } from '@/utils/format'
 import { useUserStore } from '@/stores/user'
 import {
   getWaitOpenListService,
-  deleteCourseService
 } from '@/api/admin'
 
 //定义数据
