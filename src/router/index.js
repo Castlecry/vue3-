@@ -83,6 +83,10 @@ const router = createRouter({
         {
           path: 'processCourse',
           component: () => import('@/views/admin/ProcessCourse.vue')
+        },
+        {
+          path: 'resourcesManage',
+          component: () => import('@/views/admin/resourcesManage.vue'),
         }
       ]
     }

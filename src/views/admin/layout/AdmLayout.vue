@@ -45,6 +45,10 @@ const logout = async () => {
           <el-icon><Promotion /></el-icon>
           <span>教师管理</span>
         </el-menu-item>
+        <el-menu-item index="/admin/resourcesManage">
+          <el-icon><Document /></el-icon>
+          <span>教学资源管理</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>
