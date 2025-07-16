@@ -73,3 +73,15 @@ export const editTeacherService = (teacher) => {
 export const deleteTeacherService = (id) => {
   return request.delete(`api/admin/users/teacher/${id}`);
 }
+
+export const getSubjectListService = () => {
+  return request.get('api/admin/subjects')
+}
+
+export const getTeachingPlansService = (subject) => {
+  return request.get(`api/admin/resources/by-subject/${subject}`);
+}
+
+export const getPlanContentService = (resource_type,resource_id) => {
+  return request.get(`api/admin/resources/${resource_type}/${resource_id}`);
+}

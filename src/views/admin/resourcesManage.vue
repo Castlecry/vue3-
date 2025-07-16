@@ -4,11 +4,12 @@ import { ref } from 'vue'
 import { View } from '@element-plus/icons-vue' // 详情图标
 import { getSubjectListService } from '@/api/admin.js' // 假设的学科列表接口
 import { useRouter } from 'vue-router'
-
+import { useSubjectStore } from '@/stores/subjectStore'
 // 状态管理
 const subjectList = ref([])
 const isLoading = ref(false)
 const router = useRouter()
+const subjectStore = useSubjectStore() // 实例化store
 
 // 获取学科列表数据时，格式化数据
 const getSubjectList = async () => {
@@ -27,10 +28,12 @@ const getSubjectList = async () => {
 
 // 初始化加载数据
 getSubjectList()
-
+// console.log(row)
 // 点击详情跳转
 const goToDetail = (name) => {
-  router.push(`/admin/detail/${name}`) // 跳转到详情页，携带学科
+  subjectStore.setSubject(name)
+  console.log(name)
+  router.push('/admin/detail') // 跳转到详情页，携带学科
 }
 </script>
 
@@ -43,7 +46,6 @@ const goToDetail = (name) => {
       v-loading="isLoading" 
       :data="subjectList" 
       style="width: 100%"
-      border
     >
       <el-table-column 
         prop="name" 

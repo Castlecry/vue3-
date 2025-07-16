@@ -87,6 +87,14 @@ const router = createRouter({
         {
           path: 'resourcesManage',
           component: () => import('@/views/admin/resourcesManage.vue'),
+        },
+        {
+          path: 'detail',
+          component: () => import('@/views/admin/detail.vue'),
+        },
+        {
+          path: 'plan',
+          component: () => import('@/views/admin/plan.vue'),
         }
       ]
     }
