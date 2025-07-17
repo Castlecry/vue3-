@@ -101,9 +101,9 @@ const router = createRouter({
           name: 'Overview',
           component: () => import('@/views/admin/overview/Overview.vue'), // 新增父组件
           children: [
-          { path: 'user-activity', component: () => import('@/views/admin/overview/userActivity.vue') },
-          { path: 'teaching-efficiency', component: () => import('@/views/admin/overview/teachingEfficiency.vue') },
-          { path: 'learning-effect', component: () => import('@/views/admin/overview/learningEffect.vue') }
+          { path: 'userActivity', component: () => import('@/views/admin/overview/userActivity.vue') },
+          { path: 'teachingEfficiency', component: () => import('@/views/admin/overview/teachingEfficiency.vue') },
+          { path: 'learningEffect', component: () => import('@/views/admin/overview/learningEffect.vue') }
   ]
 }
       ]

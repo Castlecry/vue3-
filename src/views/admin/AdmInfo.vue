@@ -1,5 +1,4 @@
 <script setup>
-import { adminChangePasswordService } from '@/api/admin.js'
 import PageContainer from '@/components/PageContainer.vue'
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'

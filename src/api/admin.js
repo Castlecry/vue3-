@@ -89,3 +89,19 @@ export const getPlanContentService = (resource_type,resource_id) => {
 export const exportwenjian = (resource_type,resource_id) => {
   return request.get(`api/admin/resources/${resource_type}/${resource_id}/export`);
 }
+
+export const getActivityDataService = () => {
+  return request.get('/api/admin/dashboard/usage-stats'); 
+};
+
+export const getTeachEffectDataService = () => {
+  return request.get('/api/admin/dashboard/teaching-efficiency'); 
+};
+
+export const getlowperformingsubjectsService = () => {
+  return request.get('/api/admin/dashboard/low-performing-subjects'); 
+};
+
+export const getLearningEffectService = () => {
+  return request.get('/api/admin/dashboard/student-effectiveness'); 
+};

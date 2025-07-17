@@ -3,9 +3,6 @@ import PageContainer from '@/components/PageContainer.vue'
 import { ref } from 'vue'
 import { formatTime } from '@/utils/format'
 import { useUserStore } from '@/stores/user'
-import {
-  getWaitOpenListService,
-} from '@/api/admin'
 
 //定义数据
 const openList = ref([])
