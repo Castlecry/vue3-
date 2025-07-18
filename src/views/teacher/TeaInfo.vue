@@ -99,7 +99,7 @@ const OnSubmit = () => {
       <div style="display: flex; flex-direction: column">
         <div class="stateItem">
           <el-icon><HomeFilled /></el-icon>
-          <div>项目名: 仿安大教务管理系统</div>
+          <div>项目名: 502C组教务管理系统</div>
         </div>
         <div style="margin-top: 5px" class="stateItem">
           <el-icon><UserFilled /></el-icon>

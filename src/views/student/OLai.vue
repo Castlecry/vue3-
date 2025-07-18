@@ -165,6 +165,7 @@ const isThinking = ref(false)
     <div class="input-area">
       <el-input
         v-model="inputText"
+        type="textarea"
         placeholder="输入消息并回车发送"
         @keyup.enter="sendMessage"
         class="input"
@@ -269,11 +270,16 @@ const isThinking = ref(false)
 
 .input {
   flex-grow: 1;
-  height: 40px; /* 增加输入框高度 */
+  height: auto;
+  min-height: 40px;
   .el-input__inner {
-    border-radius: 20px; /* 输入框圆角 */
-    padding: 0 20px; /* 调整内边距 */
+    border-radius: 20px;
+    padding: 10px 20px;
     font-size: 14px;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow: auto !important;
+    resize: none;
   }
 }
 

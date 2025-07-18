@@ -5,7 +5,7 @@ import { logoutService } from '@/api/login.js'
 import { useRouter } from 'vue-router'
 
 //两个需要导入的element组件
-import { Management, Promotion } from '@element-plus/icons-vue'
+import { Promotion } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 //设置用户名字
@@ -37,10 +37,6 @@ const logout = async () => {
         text-color="#fff"
         router
       >
-        <el-menu-item index="/student/info">
-          <el-icon><Management /></el-icon>
-          <span>学生信息</span>
-        </el-menu-item>
         <el-menu-item index="/student/aiol">
           <el-icon><Promotion /></el-icon>
           <span>在线学习助手</span>
