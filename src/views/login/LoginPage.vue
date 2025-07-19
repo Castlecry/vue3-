@@ -1,19 +1,17 @@
 <script setup>
+// 此处脚本逻辑完全不变，省略（与原代码一致）
 import { ref } from 'vue'
 import { User, Lock, Eleme } from '@element-plus/icons-vue'
 import { loginService } from '@/api/login.js'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 
-// 加载状态
 const loading = ref(false)
-
 const fromData = ref({
   username: '',
   password: '',
   role: 2
 })
-
 const rules = {
   username: [
     { required: true, message: '请输入账号', trigger: 'blur' },
@@ -39,7 +37,7 @@ const rules = {
         if (value !== fromData.value.password) {
           callback(new Error('两次输入密码不一致'))
         } else {
-          callback() //校验成功也得callback
+          callback()
         }
       },
       trigger: 'blur'
@@ -47,103 +45,46 @@ const rules = {
   ]
 }
 const testAccounts = {
-  student: {
-    username: 'student',
-    password: '123456',
-    role: 2
-  },
-  teacher: {
-    username: 'teacher',
-    password: '123456',
-    role: 3
-  },
-  admin: {
-    username: 'Admin',
-    password: '123456',
-    role: 1
-  }
+  student: { username: 'student', password: '123456', role: 2 },
+  teacher: { username: 'teacher', password: '123456', role: 3 },
+  admin: { username: 'Admin', password: '123456', role: 1 }
 }
 const form = ref(null)
-//登录功能
 const userStore = useUserStore()
 const router = useRouter()
 const login = async () => {
-  // //在该区域写登录测试账号
-  //  const matchedAccount = Object.values(testAccounts).find(
-  //    (account) =>
-  //      account.username === fromData.value.username &&
-  //      account.password === fromData.value.password
-  //  )
-  //  if (matchedAccount) {
-  //    // 根据角色跳转
-  //    ElMessage.success('登录成功')
-  //    if (matchedAccount.role === 2) {
-  //      router.push('/student')
-  //    } else if (matchedAccount.role === 3) {
-  //      router.push('/teacher')
-  //    } else if (matchedAccount.role === 1) {
-  //      router.push('/admin')
-  //    }
-  //    userStore.setUserId(matchedAccount.userid)
-  //    userStore.setUserName(matchedAccount.username)
-  //    return // 匹配成功后直接返回，不执行后续逻辑
-  //  }
   await form.value.validate()
   try {
-    // 调用API
     const resp = await loginService(fromData.value)
-
-    // 登录成功逻辑
     ElMessage.success('登录成功')
     userStore.setToken(resp.data.access_token)
     userStore.setUserId(resp.data.userid)
     userStore.setUserName(resp.data.username)
-
-    console.log(resp.data)
-    // 根据角色进行跳转
     if (fromData.value.role === 2) {
       router.push('/student')
     } else if (fromData.value.role === 1) {
-      // 修正变量名
       router.push('/admin/StuManage')
     } else if (fromData.value.role === 3) {
-      // 修正变量名
       router.push('/teacher')
     }
   } catch (err) {
-    // --- 这是修改后的错误处理逻辑 ---
-    console.error('登录API调用失败:', err) // 在控制台打印详细错误，方便调试
-
-    // 从错误对象中提取后端返回的错误信息来提示用户
-    // axios的错误通常在 err.response.data.detail 中
+    console.error('登录API调用失败:', err)
     if (err.response && err.response.data && err.response.data.detail) {
       ElMessage.error(err.response.data.detail)
     } else {
-      // 其他未知错误
       ElMessage.error('登录请求失败，请稍后重试。')
     }
-    // 注意：这里不再有 throw new Error(err)
   } finally {
-    // --- 无论成功或失败，最后都停止加载 ---
     loading.value = false
   }
 }
-
 </script>
 
 <template>
-  <el-row class="login-page">
-    <el-col :span="12">
-      <el-carousel :interval="3500" height="100vh" trigger="click">
-        <el-carousel-item>
-          <img src="@/assets/bg.png" alt="" class="img1" />
-        </el-carousel-item>
-        <el-carousel-item>
-          <img src="@/assets/kx.jpg" alt="" class="img2" />
-        </el-carousel-item>
-      </el-carousel>
-    </el-col>
-    <el-col :span="6" :offset="3" class="form">
+  <!-- 外层容器：全屏背景 + 居中表单 -->
+  <div class="login-container">
+    <!-- 登录表单卡片 -->
+    <el-card class="login-card">
       <el-form
         ref="form"
         :model="fromData"
@@ -155,7 +96,7 @@ const login = async () => {
         <el-form-item>
           <h1>登录</h1>
         </el-form-item>
-        <el-form-item prop="userNum">
+        <el-form-item prop="username"> <!-- 修正原代码的prop拼写错误（userNum→username） -->
           <el-input
             :prefix-icon="User"
             v-model="fromData.username"
@@ -197,52 +138,53 @@ const login = async () => {
               auto-insert-space
               @click="$router.push('/register')"
             >
-              <!-- 修改这里 -->
               注册
             </el-button>
           </div>
         </el-form-item>
       </el-form>
-    </el-col>
-  </el-row>
+    </el-card>
+  </div>
 </template>
 
 <style scoped lang="scss">
-.login-page {
-  .img1 {
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-  }
-  .img2 {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* 或其他适当的值 */
-  }
-
-  // elementui布局横向全部填充满，纵向需要用户设置
+// 全屏背景容器
+.login-container {
+  // 占满整个屏幕
+  width: 100vw;
   height: 100vh;
-  background-color: #fff;
-  .form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    user-select: none;
-    .title {
-      margin: 0 auto;
-    }
-    .button {
-      width: 100%;
-    }
-    //表单项下面只能有一个元素，设置布局在这个元素身上设置。比如最后“注册”，如果想再设置需要用div
-    .flex {
-      //这个100%也有助于组件分开位置
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-    }
-  }
+  // 背景图设置（替换成你的图片路径）
+  background-image: url('@/assets/denglu.jpg'); /* 这里替换为你的图片路径 */
+  background-size: cover; /* 背景图自适应拉伸，保持比例填满屏幕 */
+  background-position: center; /* 背景图居中显示 */
+  background-repeat: no-repeat; /* 背景图不重复 */
+  // 启用flex布局，让子元素居中
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  // 可选：加一层半透明遮罩，让表单更清晰
+  // background-color: rgba(0, 0, 0, 0.3); /* 黑色半透明遮罩 */
 }
+
+// 登录卡片样式
+.login-card {
+  width: 400px; /* 表单宽度，可根据需要调整 */
+  padding: 30px; /* 内部间距 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* 卡片阴影，增强立体感 */
+  background-color: rgba(255, 255, 255, 0.6); /* 卡片背景半透明，可选 */
+}
+
+// 表单内部样式（复用原样式，微调）
+.realForm {
+  width: 100%;
+}
+
+.flex {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+
 .button-group {
   display: flex;
   gap: 12px;

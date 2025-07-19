@@ -16,11 +16,6 @@ userName.value = userStore.userName
 //登出功能
 const router = useRouter()
 const logout = async () => {
-  //1.后端发送请求 删除Redis数据库缓存token
-  await logoutService(userStore.token)
-  //2.前端清空token信息
-  userStore.setToken('')
-
   ElMessage.success('登出成功')
   router.push('/login')
 }
@@ -54,13 +49,11 @@ const logout = async () => {
     <el-container>
       <el-header class="mainHeader">
         <div>
-          <div style="display: flex; align-items: center">
-            <img src="@/assets/logo_school.png" />
-            <div style="color: #ffffff; font-size: 30px">教务管理系统</div>
-          </div>
+          <!-- 这里应用了新的样式类 -->
+          <div class="system-title">教学实训智能体系统</div>
         </div>
         <div style="display: flex; align-items: center">
-          <div>欢迎您：{{ userName }} 同学</div>
+          <div></div>
           <div style="margin-left: 10px">
             <el-button type="primary" @click="logout">登出</el-button>
           </div>
@@ -81,7 +74,6 @@ const logout = async () => {
     background-color: #232323;
     &__logo {
       height: 120px;
-      // background: url('@/assets/logo.png') no-repeat center / 120px auto;
     }
     .el-menu {
       border-right: none;
@@ -119,5 +111,20 @@ const logout = async () => {
   display: flex;
   justify-content: space-between;
   background-color: rgb(4, 131, 213);
+}
+
+/* [新增] 从您的参考代码中复制过来的样式 */
+.system-title {
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
 }
 </style>

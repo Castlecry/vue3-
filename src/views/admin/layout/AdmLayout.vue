@@ -16,8 +16,6 @@ userName.value = userStore.userName
 // 登出功能
 const router = useRouter()
 const logout = async () => {
-  await logoutService(userStore.token)
-  userStore.setToken('')
   ElMessage.success('登出成功')
   router.push('/login')
 }
@@ -25,7 +23,7 @@ const logout = async () => {
 
 <template>
   <el-container class="layout-container">
-    <el-aside width="200px">
+    <el-aside width="250px">
       <div class="el-aside__logo"></div>
       <el-menu
         active-text-color="#ffd04b"
@@ -80,14 +78,11 @@ const logout = async () => {
       <!-- 头部、内容区、底部保持不变 -->
       <el-header class="mainHeader">
         <div>
-          <div style="display: flex; align-items: center">
-            <img src="@/assets/logo_school.png" />
-            <div style="color: #ffffff; font-size: 30px">教务管理系统</div>
-          </div>
+          <div class="system-title">教学实训智能体系统</div>
         </div>
 
         <div style="display: flex; align-items: center">
-          <div>欢迎您：{{ userName }} 用户</div>
+          <div></div>
           <div style="margin-left: 10px">
             <el-button type="primary" @click="logout">登出</el-button>
           </div>
@@ -117,7 +112,7 @@ const logout = async () => {
         padding-left: 30px !important;  /* 父菜单标题缩进 */
       }
       .el-menu-item {
-        padding-left: 50px !important;  /* 子菜单标题缩进，与父菜单区分 */
+        padding-left: 20px !important;  /* 子菜单标题缩进，与父菜单区分 */
       }
     }
   }
@@ -141,4 +136,18 @@ const logout = async () => {
   justify-content: space-between;
   background-color: rgb(4, 131, 213);
 }
-</style>
+
+.system-title {
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+</style>    

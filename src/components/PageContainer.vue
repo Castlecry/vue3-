@@ -32,7 +32,7 @@ export default {
 <style lang="scss" scoped>
 .page-container {
   // height: 100%;
-  min-height: 100%;
+  min-height: 110%;
   box-sizing: border-box;
   .header {
     display: flex;
